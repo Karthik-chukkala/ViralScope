@@ -40,7 +40,7 @@ The run used 42,730 valid rows: 34,184 train and 8,546 chronological holdout, wi
 
 The combined model improves holdout SRC slightly over text alone, but has slightly worse MAE, RMSE, and R². There is no evidence here that adding context improves overall score estimation. Large train-to-holdout gaps indicate overfitting, especially for sparse text features; no parameter tuning was performed on the holdout.
 
-The complete report is `artifacts/baseline-metrics.json`. Models are stored under `artifacts/models/`, which is gitignored. Scores are not official test results and do not establish expected performance on the entire training split.
+The complete report is `artifacts/baseline-metrics.json`. Models are stored under `artifacts/models/` and included with the research repository under the SMP Challenge Community License. Scores are not official test results and do not establish expected performance on the entire training split.
 
 ## Run and Reproduce
 

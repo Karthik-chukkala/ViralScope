@@ -6,12 +6,10 @@ __pycache__/
 .mypy_cache/
 .env
 .env.*
-data/
 cache/
+# Keep image bytes out of the public repository pending separate review.
 artifacts/images/
-artifacts/embeddings/
-artifacts/models/
-artifacts/*.json
+# Do not redistribute copied papers or scraped dataset/page text.
 files/*.pdf
 files/*.txt
 !files/setup.txt

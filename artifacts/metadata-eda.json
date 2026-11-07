@@ -1,0 +1,580 @@
+{
+  "generated_at_utc": "2026-11-07T16:55:45.999370+00:00",
+  "dataset": {
+    "repository": "smpchallenge/SMP-Image",
+    "revision": "f131dba653a05c0e3c6294388f81ed3fbd9c71a0",
+    "split": "train",
+    "expected_rows": null
+  },
+  "scan": {
+    "rows_scanned": 42730,
+    "shards_scanned": 7,
+    "shards_available": 49,
+    "sampled": true,
+    "shard_selection": "evenly_spaced",
+    "shard_names": [
+      "data/train-00000.parquet",
+      "data/train-00008.parquet",
+      "data/train-00016.parquet",
+      "data/train-00024.parquet",
+      "data/train-00032.parquet",
+      "data/train-00040.parquet",
+      "data/train-00048.parquet"
+    ],
+    "row_groups_scanned": 430,
+    "columns_read": [
+      "Uid",
+      "Pid",
+      "Postdate",
+      "Category",
+      "Subcategory",
+      "Concept",
+      "Title",
+      "Alltags"
+    ],
+    "image_bytes_read": false
+  },
+  "eda": {
+    "rows_scanned": 42730,
+    "missing_counts": {
+      "Uid": 0,
+      "Pid": 0,
+      "Postdate": 0,
+      "Category": 0,
+      "Subcategory": 0,
+      "Concept": 0,
+      "Title": 1474,
+      "Alltags": 0
+    },
+    "unique_users": 10976,
+    "unique_post_ids": 42730,
+    "duplicate_post_id_rows": 0,
+    "invalid_timestamp_count": 0,
+    "category_frequencies": [
+      {
+        "value": "Travel&Active&Sports",
+        "count": 9047
+      },
+      {
+        "value": "Holiday&Celebrations",
+        "count": 7614
+      },
+      {
+        "value": "Fashion",
+        "count": 6381
+      },
+      {
+        "value": "Entertainment",
+        "count": 4510
+      },
+      {
+        "value": "Social&People",
+        "count": 3292
+      },
+      {
+        "value": "Animal",
+        "count": 3164
+      },
+      {
+        "value": "Whether&Season",
+        "count": 2680
+      },
+      {
+        "value": "Food",
+        "count": 2560
+      },
+      {
+        "value": "Urban",
+        "count": 2213
+      },
+      {
+        "value": "Electronics",
+        "count": 844
+      },
+      {
+        "value": "Family",
+        "count": 425
+      }
+    ],
+    "subcategory_frequencies": [
+      {
+        "value": "Halloween",
+        "count": 2369
+      },
+      {
+        "value": "Music",
+        "count": 1781
+      },
+      {
+        "value": "Makeup",
+        "count": 1683
+      },
+      {
+        "value": "Books",
+        "count": 1607
+      },
+      {
+        "value": "Architecture",
+        "count": 1250
+      },
+      {
+        "value": "Wedding",
+        "count": 1247
+      },
+      {
+        "value": "Christmas",
+        "count": 1208
+      },
+      {
+        "value": "Cars",
+        "count": 1097
+      },
+      {
+        "value": "Drinks",
+        "count": 1097
+      },
+      {
+        "value": "Thanksgiving",
+        "count": 1089
+      },
+      {
+        "value": "Good,Morning",
+        "count": 1057
+      },
+      {
+        "value": "Fish",
+        "count": 1020
+      },
+      {
+        "value": "StreetArt",
+        "count": 963
+      },
+      {
+        "value": "Tattoos",
+        "count": 898
+      },
+      {
+        "value": "Movies",
+        "count": 880
+      },
+      {
+        "value": "Horses",
+        "count": 863
+      },
+      {
+        "value": "Skateboarding",
+        "count": 846
+      },
+      {
+        "value": "Electronics",
+        "count": 844
+      },
+      {
+        "value": "Dessert",
+        "count": 830
+      },
+      {
+        "value": "New",
+        "count": 821
+      },
+      {
+        "value": "Bodybuilding",
+        "count": 782
+      },
+      {
+        "value": "Good",
+        "count": 767
+      },
+      {
+        "value": "Hair",
+        "count": 748
+      },
+      {
+        "value": "Jewelry",
+        "count": 747
+      },
+      {
+        "value": "Sunny",
+        "count": 708
+      },
+      {
+        "value": "Party",
+        "count": 703
+      },
+      {
+        "value": "Nails",
+        "count": 692
+      },
+      {
+        "value": "Travel",
+        "count": 633
+      },
+      {
+        "value": "Baseball",
+        "count": 607
+      },
+      {
+        "value": "Raining",
+        "count": 605
+      },
+      {
+        "value": "Friends",
+        "count": 572
+      },
+      {
+        "value": "Dance",
+        "count": 533
+      },
+      {
+        "value": "Motorcycles",
+        "count": 519
+      },
+      {
+        "value": "Insects",
+        "count": 517
+      },
+      {
+        "value": "Cheerleading",
+        "count": 493
+      },
+      {
+        "value": "San",
+        "count": 480
+      },
+      {
+        "value": "Love",
+        "count": 472
+      },
+      {
+        "value": "Cats",
+        "count": 443
+      },
+      {
+        "value": "Hockey",
+        "count": 439
+      },
+      {
+        "value": "Football",
+        "count": 436
+      },
+      {
+        "value": "Gymnastics",
+        "count": 436
+      },
+      {
+        "value": "Soccer",
+        "count": 433
+      },
+      {
+        "value": "OOTD",
+        "count": 423
+      },
+      {
+        "value": "Piercings",
+        "count": 392
+      },
+      {
+        "value": "Babies",
+        "count": 373
+      },
+      {
+        "value": "Health,Fitness",
+        "count": 333
+      },
+      {
+        "value": "Coffee",
+        "count": 323
+      },
+      {
+        "value": "Dogs",
+        "count": 321
+      },
+      {
+        "value": "Snowing",
+        "count": 321
+      },
+      {
+        "value": "Sneakers",
+        "count": 297
+      },
+      {
+        "value": "Tea",
+        "count": 297
+      },
+      {
+        "value": "Selfies",
+        "count": 294
+      },
+      {
+        "value": "Guys,Fashion",
+        "count": 278
+      },
+      {
+        "value": "Baltimore",
+        "count": 272
+      },
+      {
+        "value": "Fall",
+        "count": 245
+      },
+      {
+        "value": "Winter",
+        "count": 244
+      },
+      {
+        "value": "Video&Games",
+        "count": 242
+      },
+      {
+        "value": "Cloudy",
+        "count": 240
+      },
+      {
+        "value": "Summer",
+        "count": 236
+      },
+      {
+        "value": "Sports",
+        "count": 219
+      },
+      {
+        "value": "Denver",
+        "count": 199
+      },
+      {
+        "value": "Birthday",
+        "count": 173
+      },
+      {
+        "value": "Basketball",
+        "count": 114
+      },
+      {
+        "value": "Seattle",
+        "count": 104
+      },
+      {
+        "value": "Guys",
+        "count": 92
+      },
+      {
+        "value": "Spring",
+        "count": 81
+      },
+      {
+        "value": "Running",
+        "count": 70
+      },
+      {
+        "value": "Fashion",
+        "count": 64
+      },
+      {
+        "value": "High,Heels",
+        "count": 53
+      },
+      {
+        "value": "Kids",
+        "count": 52
+      },
+      {
+        "value": "Bracelets",
+        "count": 51
+      },
+      {
+        "value": "Girls",
+        "count": 38
+      },
+      {
+        "value": "Earrings",
+        "count": 36
+      },
+      {
+        "value": "Girls,Fashion",
+        "count": 19
+      },
+      {
+        "value": "General",
+        "count": 13
+      },
+      {
+        "value": "Holidays",
+        "count": 4
+      },
+      {
+        "value": "Super",
+        "count": 2
+      }
+    ],
+    "top_20_concepts": [
+      {
+        "value": "trickortreat",
+        "count": 705
+      },
+      {
+        "value": "rnb",
+        "count": 383
+      },
+      {
+        "value": "thanks",
+        "count": 375
+      },
+      {
+        "value": "bases",
+        "count": 320
+      },
+      {
+        "value": "funtime",
+        "count": 305
+      },
+      {
+        "value": "repeat",
+        "count": 294
+      },
+      {
+        "value": "flick",
+        "count": 292
+      },
+      {
+        "value": "jackolantern",
+        "count": 292
+      },
+      {
+        "value": "nook",
+        "count": 286
+      },
+      {
+        "value": "samsunggalaxy",
+        "count": 285
+      },
+      {
+        "value": "newyearseve",
+        "count": 276
+      },
+      {
+        "value": "bestfriend",
+        "count": 275
+      },
+      {
+        "value": "squat",
+        "count": 266
+      },
+      {
+        "value": "sanfrancsico",
+        "count": 265
+      },
+      {
+        "value": "merrychristmas",
+        "count": 263
+      },
+      {
+        "value": "moviestar",
+        "count": 257
+      },
+      {
+        "value": "skatelife",
+        "count": 249
+      },
+      {
+        "value": "gettingready",
+        "count": 242
+      },
+      {
+        "value": "remix",
+        "count": 242
+      },
+      {
+        "value": "climax",
+        "count": 239
+      }
+    ],
+    "monthly_post_counts_utc": [
+      {
+        "month": "2015-02",
+        "count": 16
+      },
+      {
+        "month": "2015-03",
+        "count": 5228
+      },
+      {
+        "month": "2015-04",
+        "count": 1616
+      },
+      {
+        "month": "2015-05",
+        "count": 1749
+      },
+      {
+        "month": "2015-06",
+        "count": 1126
+      },
+      {
+        "month": "2015-07",
+        "count": 1470
+      },
+      {
+        "month": "2015-08",
+        "count": 4598
+      },
+      {
+        "month": "2015-09",
+        "count": 3187
+      },
+      {
+        "month": "2015-10",
+        "count": 4155
+      },
+      {
+        "month": "2015-11",
+        "count": 5111
+      },
+      {
+        "month": "2015-12",
+        "count": 4451
+      },
+      {
+        "month": "2016-01",
+        "count": 4261
+      },
+      {
+        "month": "2016-02",
+        "count": 5762
+      }
+    ],
+    "title_length_characters": {
+      "count": 41256,
+      "min": 1,
+      "median": 19.0,
+      "mean": 29.60207000193911,
+      "max": 263
+    },
+    "title_word_counts": {
+      "count": 41256,
+      "min": 1,
+      "median": 3.0,
+      "mean": 4.351924568547605,
+      "max": 55
+    },
+    "tag_field_length_characters": {
+      "count": 42730,
+      "min": 3,
+      "median": 127.0,
+      "mean": 180.59246431078867,
+      "max": 1680
+    },
+    "tag_field_token_counts": {
+      "count": 42730,
+      "min": 1,
+      "median": 15.0,
+      "mean": 20.80762930025743,
+      "max": 75
+    },
+    "privacy": {
+      "raw_text_written": false,
+      "raw_user_ids_written": false,
+      "coordinates_read": false,
+      "image_bytes_read": false
+    }
+  }
+}

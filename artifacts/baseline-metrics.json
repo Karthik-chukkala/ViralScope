@@ -1,0 +1,105 @@
+{
+  "generated_at_utc": "2026-11-07T17:03:44.177272+00:00",
+  "dataset": {
+    "generated_at_utc": "2026-11-07T16:59:28.419279+00:00",
+    "dataset": "smpchallenge/SMP-Image",
+    "revision": "f131dba653a05c0e3c6294388f81ed3fbd9c71a0",
+    "split": "train",
+    "rows": 42730,
+    "columns": [
+      "Postdate",
+      "Category",
+      "Subcategory",
+      "Concept",
+      "Title",
+      "Alltags",
+      "label"
+    ],
+    "sample_method": "evenly_spaced_shards",
+    "shards_available": 49,
+    "shards_selected": [
+      "data/train-00000.parquet",
+      "data/train-00008.parquet",
+      "data/train-00016.parquet",
+      "data/train-00024.parquet",
+      "data/train-00032.parquet",
+      "data/train-00040.parquet",
+      "data/train-00048.parquet"
+    ],
+    "images_downloaded": false,
+    "profile_and_location_fields_cached": false,
+    "local_cache_contains_post_text": true
+  },
+  "evaluation": {
+    "protocol": "chronological local holdout from sampled training shards",
+    "holdout_fraction_requested": 0.2,
+    "cutoff_utc": "2016-01-11T08:05:51+00:00",
+    "valid_rows": 42730,
+    "train_rows": 34184,
+    "holdout_rows": 8546,
+    "official_test_scored": false
+  },
+  "metrics": {
+    "median": {
+      "train": {
+        "src": null,
+        "mae": 2.0659407922619266,
+        "rmse": 2.5993765014915544,
+        "r2": -0.003271274113802347
+      },
+      "holdout": {
+        "src": null,
+        "mae": 2.012655051773392,
+        "rmse": 2.4935475979882677,
+        "r2": -4.058127959116753e-05
+      }
+    },
+    "tfidf_ridge": {
+      "train": {
+        "src": 0.9376064671816564,
+        "mae": 0.696324504998316,
+        "rmse": 1.0462391570271077,
+        "r2": 0.837466854375161
+      },
+      "holdout": {
+        "src": 0.5750562018507573,
+        "mae": 1.6226127785556492,
+        "rmse": 2.0575823965656417,
+        "r2": 0.3190789346336571
+      }
+    },
+    "context_catboost": {
+      "train": {
+        "src": 0.788280019045248,
+        "mae": 1.1524724127826445,
+        "rmse": 1.6546011874515458,
+        "r2": 0.5934942773700613
+      },
+      "holdout": {
+        "src": 0.3170597023657538,
+        "mae": 1.8977667081406733,
+        "rmse": 2.3828609690131044,
+        "r2": 0.08677097563524294
+      }
+    },
+    "text_context_ridge": {
+      "train": {
+        "src": 0.9406808260714877,
+        "mae": 0.6418423359383642,
+        "rmse": 0.9714366610349979,
+        "r2": 0.859877144501145
+      },
+      "holdout": {
+        "src": 0.578398050536486,
+        "mae": 1.6421499581204004,
+        "rmse": 2.0657705094600987,
+        "r2": 0.31364872461212767
+      }
+    }
+  },
+  "models": {
+    "tfidf_ridge": "artifacts/models/tfidf-ridge.joblib",
+    "context_catboost": "artifacts/models/context-catboost.cbm",
+    "text_context_ridge": "artifacts/models/text-context-ridge.joblib"
+  }
+}

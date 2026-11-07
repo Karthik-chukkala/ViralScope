@@ -36,7 +36,7 @@ To adjust sampling/concurrency, use `--sample-shards 7 --workers 4`. To restore 
 
 The pinned sample contains 42,730 rows from seven evenly spaced shards. It has 10,976 distinct users, no duplicate post IDs in this sample, no missing timestamps/categories/tags, and 1,474 missing titles (3.45%). The most frequent categories are Travel&Active&Sports (9,047), Holiday&Celebrations (7,614), and Fashion (6,381). These figures describe the selected shards only; do not extrapolate them as exact full-train rates. The aggregate output is `artifacts/metadata-eda.json`.
 
-The separate training cache is `data/train-sample.parquet`, with its source revision and shard list in `data/train-sample-manifest.json`. It includes `label`, `Postdate`, `Category`, `Subcategory`, `Concept`, `Title`, and `Alltags`; it excludes IDs, profile/location fields, and image paths. `data/` is gitignored. The local cache contains raw title/tag text, so keep it local and do not publish or commit it.
+The separate training sample is `data/train-sample.parquet`, with its source revision and shard list in `data/train-sample-manifest.json`. It includes `label`, `Postdate`, `Category`, `Subcategory`, `Concept`, `Title`, and `Alltags`; it excludes IDs, profile/location fields, and image paths. The sample is included in this research repository under the SMP Challenge Community License and contains raw title/tag text. Do not redistribute it outside the license terms or use it for commercial/foundation-model development.
 
 ## Implemented Slice: Target Labels
 

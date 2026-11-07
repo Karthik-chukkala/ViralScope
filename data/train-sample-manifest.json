@@ -1,0 +1,30 @@
+{
+  "generated_at_utc": "2026-11-07T16:59:28.419279+00:00",
+  "dataset": "smpchallenge/SMP-Image",
+  "revision": "f131dba653a05c0e3c6294388f81ed3fbd9c71a0",
+  "split": "train",
+  "rows": 42730,
+  "columns": [
+    "Postdate",
+    "Category",
+    "Subcategory",
+    "Concept",
+    "Title",
+    "Alltags",
+    "label"
+  ],
+  "sample_method": "evenly_spaced_shards",
+  "shards_available": 49,
+  "shards_selected": [
+    "data/train-00000.parquet",
+    "data/train-00008.parquet",
+    "data/train-00016.parquet",
+    "data/train-00024.parquet",
+    "data/train-00032.parquet",
+    "data/train-00040.parquet",
+    "data/train-00048.parquet"
+  ],
+  "images_downloaded": false,
+  "profile_and_location_fields_cached": false,
+  "local_cache_contains_post_text": true
+}

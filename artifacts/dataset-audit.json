@@ -1,0 +1,154 @@
+{
+  "generated_at_utc": "2026-11-07T14:34:12.303911+00:00",
+  "dataset": {
+    "repository": "smpchallenge/SMP-Image",
+    "revision": "f131dba653a05c0e3c6294388f81ed3fbd9c71a0",
+    "repository_file_count": 80,
+    "license": {
+      "identifier": "other",
+      "name": "smp-license",
+      "link": "LICENSE.md"
+    }
+  },
+  "splits": {
+    "train": {
+      "rows": 305613,
+      "parquet_bytes": 25658940071,
+      "memory_bytes": 25741917706
+    },
+    "test": {
+      "rows": 180581,
+      "parquet_bytes": 14911095984,
+      "memory_bytes": 14957575272
+    }
+  },
+  "viewer_size_metadata": {
+    "partial": false,
+    "total_rows": 486194,
+    "revision_note": "The viewer endpoint does not expose a revision; the repository main SHA was checked against the requested pin immediately before query."
+  },
+  "features": [
+    {
+      "name": "image",
+      "type": "Image(mode=None, decode=True)"
+    },
+    {
+      "name": "Uid",
+      "type": "Value('string')"
+    },
+    {
+      "name": "Pid",
+      "type": "Value('string')"
+    },
+    {
+      "name": "img_filepath",
+      "type": "Value('string')"
+    },
+    {
+      "name": "label",
+      "type": "Value('float32')"
+    },
+    {
+      "name": "Postdate",
+      "type": "Value('string')"
+    },
+    {
+      "name": "Longitude",
+      "type": "Value('string')"
+    },
+    {
+      "name": "Latitude",
+      "type": "Value('string')"
+    },
+    {
+      "name": "Geoaccuracy",
+      "type": "Value('string')"
+    },
+    {
+      "name": "Category",
+      "type": "Value('string')"
+    },
+    {
+      "name": "Subcategory",
+      "type": "Value('string')"
+    },
+    {
+      "name": "Concept",
+      "type": "Value('string')"
+    },
+    {
+      "name": "Alltags",
+      "type": "Value('string')"
+    },
+    {
+      "name": "Title",
+      "type": "Value('string')"
+    },
+    {
+      "name": "Mediatype",
+      "type": "Value('string')"
+    },
+    {
+      "name": "Mediastatus",
+      "type": "Value('string')"
+    },
+    {
+      "name": "Pathalias",
+      "type": "Value('string')"
+    },
+    {
+      "name": "Ispublic",
+      "type": "Value('string')"
+    },
+    {
+      "name": "photo_count",
+      "type": "Value('float32')"
+    },
+    {
+      "name": "ispro",
+      "type": "Value('float32')"
+    },
+    {
+      "name": "timezone_offset",
+      "type": "Value('string')"
+    },
+    {
+      "name": "photo_firstdate",
+      "type": "Value('string')"
+    },
+    {
+      "name": "photo_firstdatetaken",
+      "type": "Value('string')"
+    },
+    {
+      "name": "timezone_id",
+      "type": "Value('string')"
+    },
+    {
+      "name": "user_description",
+      "type": "Value('string')"
+    },
+    {
+      "name": "location_description",
+      "type": "Value('string')"
+    }
+  ],
+  "parquet_storage": {
+    "shard_count": 78,
+    "shards_by_split": {
+      "test": 29,
+      "train": 49
+    },
+    "bytes_by_split": {
+      "test": 14911095984,
+      "train": 25658940071
+    },
+    "total_bytes": 40570036055,
+    "total_gib": 37.78
+  },
+  "scope": {
+    "dataset_rows_downloaded": false,
+    "image_bytes_downloaded": false,
+    "test_labels_verified": false
+  }
+}

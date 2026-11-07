@@ -36,7 +36,7 @@ The resolution is a deterministic sample of seven shards spread across the pinne
 
 The SMP Challenge Community License is research/non-commercial and includes attribution and acceptable-use conditions. `Notice` contains the required attribution text, and the website displays **Powered by SMP Challenge**. The complete current agreement/AUP still needs supervisor review before public deployment, distribution, or image use. Do not use the data or outputs to develop or enhance a foundational generative AI model.
 
-The local training cache includes raw title/tag text but excludes IDs, profile fields, coordinates, and image paths. `data/` and `artifacts/models/` are gitignored; keep them local and do not publish them. Aggregate reports contain no raw post text or user IDs.
+The published training sample includes raw title/tag text but excludes IDs, profile fields, coordinates, and image paths. The sample and trained models are derivatives distributed for research/non-commercial use under the SMP Challenge Community License, with a copy of the agreement and `Notice` included. Aggregate reports contain no raw post text or user IDs. Complete papers, copied text extracts, and images are not included.
 
 ## 3. What Is Implemented
 

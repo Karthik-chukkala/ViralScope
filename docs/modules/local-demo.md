@@ -40,6 +40,6 @@ The API was exercised in-process against all three saved models; each returned H
 
 ## License and Limitations
 
-The page visibly displays **Powered by SMP Challenge** and the repository includes the required attribution in [Notice](../../Notice). The app does not bundle the gated agreement or AUP, whose current full terms still require supervisor review. Do not deploy publicly or distribute model/data artifacts until the supervisor confirms license, AUP, attribution, privacy, and distribution requirements. Keep `data/` and `artifacts/models/` local; both are gitignored.
+The page visibly displays **Powered by SMP Challenge** and the repository includes the required attribution in [Notice](../../Notice) and a copy of the Community License in [LICENSE-SMP-CHALLENGE](../../LICENSE-SMP-CHALLENGE.md). The seven-shard sample and baseline models are included in this research repository under that license. The incorporated AUP still requires review before reuse; images are not included or displayed.
 
 Predictions inherit the constraints of a seven-shard training sample and one chronological holdout that may share users across partitions. They are historical Flickr benchmark estimates and should not be interpreted as causal claims, user judgments, or platform-wide forecasts. Images remain deferred pending license review and a separate model milestone.

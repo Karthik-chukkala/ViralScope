@@ -24,7 +24,9 @@ HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.sample_cache --sam
 .venv/bin/python -m uvicorn viralscope.demo_app:app --host 127.0.0.1 --port 8000
 ```
 
-`data/`, model files, and generated audit JSON are local artifacts and are gitignored. The sample cache contains title/tag text, so keep it local.
+This research repository includes the 42,730-row, seven-shard training sample, its manifest, trained baseline models, and aggregate audit reports. These are SMP Challenge materials or derivatives distributed for research/non-commercial use under [the SMP Challenge Community License](LICENSE-SMP-CHALLENGE.md); retain the `Notice` file and review the agreement/AUP before reuse. The sample contains post titles and tags, but no user IDs, post IDs, images, coordinates, or profile fields. Do not use these materials for commercial purposes or foundational generative AI development.
+
+The full image-bearing dataset, image assets, and copied research papers/text extracts are not included. Research paper references and source links are listed in the [research blueprint](docs/research-and-project-blueprint.md).
 
 ## Project Notes
 
@@ -39,4 +41,4 @@ The selected dataset revision is `f131dba653a05c0e3c6294388f81ed3fbd9c71a0`. The
 
 ## License
 
-The dataset is governed by the SMP Challenge Community License and an incorporated Acceptable Use Policy. `Notice` contains the required attribution text; the demo displays **Powered by SMP Challenge**. Review the complete current license/AUP with the project supervisor before public deployment, redistribution, or image use. Do not put dataset samples, copied research extracts, local caches, or trained model artifacts in this source repository.
+The dataset is governed by the SMP Challenge Community License and an incorporated Acceptable Use Policy. A copy of the March 17, 2025 agreement is included; `Notice` contains the required attribution text, and the demo displays **Powered by SMP Challenge**. The AUP is incorporated by reference and must be reviewed before reuse. Image use/display remains out of scope.
