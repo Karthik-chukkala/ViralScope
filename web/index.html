@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e9f4f0">
+  <title>ViralScope | Popularity research demo</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #173b36;
+      --muted: #58716c;
+      --line: #c5d8d1;
+      --paper: #f5faf7;
+      --mint: #e4f1ec;
+      --green: #17685c;
+      --coral: #c34f3c;
+      --gold: #d7a338;
+      --white: #fff;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--paper);
+      background-image: linear-gradient(120deg, rgba(220, 239, 230, .7), transparent 42%);
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 70px;
+      padding: 0 clamp(20px, 5vw, 72px);
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: baseline; gap: 12px; }
+    .brand strong { font: 700 25px Georgia, serif; letter-spacing: 0; }
+    .brand span, .header-note { color: var(--muted); font-size: 12px; }
+    main { max-width: 1320px; margin: auto; padding: 30px clamp(20px, 5vw, 72px) 50px; }
+    .intro { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+    h1 { margin: 0 0 8px; font: 600 34px/1.1 Georgia, serif; letter-spacing: 0; }
+    .intro p { max-width: 650px; margin: 0; color: var(--muted); line-height: 1.5; }
+    .scope-mark { flex: 0 0 auto; border-left: 3px solid var(--coral); padding: 4px 0 4px 12px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .workspace { display: grid; grid-template-columns: minmax(320px, .92fr) minmax(420px, 1.08fr); gap: clamp(28px, 5vw, 72px); }
+    h2 { margin: 0 0 18px; font: 600 20px Georgia, serif; letter-spacing: 0; }
+    form { display: grid; gap: 15px; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+    label { display: grid; gap: 7px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    input, textarea, select {
+      width: 100%; min-width: 0; border: 1px solid var(--line); border-radius: 4px;
+      padding: 11px 12px; color: var(--ink); background: var(--white); font: 14px "Trebuchet MS", Verdana, sans-serif;
+    }
+    textarea { min-height: 92px; resize: vertical; line-height: 1.45; }
+    input:focus, textarea:focus, select:focus { outline: 2px solid rgba(23, 104, 92, .22); border-color: var(--green); }
+    .submit-row { display: flex; align-items: center; gap: 14px; margin-top: 2px; }
+    button { flex: 0 0 auto; white-space: nowrap; border: 0; border-radius: 4px; background: var(--green); color: white; padding: 12px 17px; font: 700 14px "Trebuchet MS", Verdana, sans-serif; cursor: pointer; }
+    button:hover { background: #10584e; }
+    button:disabled { opacity: .65; cursor: wait; }
+    .form-note { color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .result-area { border-left: 1px solid var(--line); padding-left: clamp(22px, 3vw, 42px); min-width: 0; }
+    .result-head { display: flex; justify-content: space-between; align-items: start; gap: 16px; }
+    .score-wrap { display: flex; align-items: baseline; gap: 9px; margin: 4px 0 18px; }
+    .score { font: 600 48px/1 Georgia, serif; color: var(--green); }
+    .score-unit { color: var(--muted); font-size: 12px; }
+    .empty-state { min-height: 96px; display: flex; align-items: center; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    .explanation-list { display: grid; gap: 8px; padding: 0; margin: 14px 0 8px; list-style: none; }
+    .explanation-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding-bottom: 7px; border-bottom: 1px solid #dce8e3; font-size: 12px; }
+    .explanation-list li span:first-child { overflow-wrap: anywhere; }
+    .positive { color: var(--coral); font-variant-numeric: tabular-nums; }
+    .negative { color: var(--green); font-variant-numeric: tabular-nums; }
+    .error { color: #a42e21; font-size: 12px; }
+    .divider { height: 1px; border: 0; margin: 30px 0 24px; background: var(--line); }
+    .dataset-snapshot { padding-top: 24px; border-top: 1px solid var(--line); }
+    .dataset-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin: 18px 0 24px; }
+    .dataset-kpi { min-width: 0; padding-top: 9px; border-top: 3px solid var(--green); }
+    .dataset-kpi:nth-child(2) { border-color: var(--gold); }
+    .dataset-kpi:nth-child(3) { border-color: var(--coral); }
+    .dataset-kpi:nth-child(4) { border-color: #5785a1; }
+    .dataset-kpi span, .dataset-kpi small { display: block; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .dataset-kpi strong { display: block; margin: 5px 0; font: 600 25px Georgia, serif; font-variant-numeric: tabular-nums; }
+    .dataset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; }
+    .dataset-grid h3 { margin: 0 0 12px; font-size: 13px; }
+    .histogram { display: flex; align-items: end; gap: 4px; height: 112px; padding: 8px 0 0; border-bottom: 1px solid var(--line); }
+    .histogram span { flex: 1 1 0; min-width: 3px; background: #4b9b87; }
+    .chart-axis { display: flex; justify-content: space-between; margin-top: 6px; color: var(--muted); font-size: 10px; }
+    .category-bars { display: grid; gap: 8px; }
+    .category-row { display: grid; grid-template-columns: minmax(100px, 1.15fr) 2fr auto; align-items: center; gap: 10px; font-size: 11px; }
+    .category-name { overflow-wrap: anywhere; color: var(--muted); }
+    .category-track { height: 6px; background: #dbe8e3; }
+    .category-fill { height: 100%; background: var(--coral); }
+    .metrics-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+    .sample-count { color: var(--muted); font-size: 11px; text-align: right; }
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+    .metric-model { min-width: 0; padding-top: 12px; border-top: 3px solid var(--green); }
+    .metric-model:nth-child(2) { border-color: var(--gold); }
+    .metric-model:nth-child(3) { border-color: var(--coral); }
+    .metric-model h3 { margin: 0 0 14px; font-size: 13px; line-height: 1.3; }
+    .metric-row { display: flex; justify-content: space-between; gap: 8px; margin: 7px 0 4px; color: var(--muted); font-size: 11px; }
+    .metric-row b { color: var(--ink); font-variant-numeric: tabular-nums; }
+    .bar-track { height: 5px; background: #dbe8e3; }
+    .bar { height: 100%; background: var(--green); }
+    .metric-model:nth-child(2) .bar { background: var(--gold); }
+    .metric-model:nth-child(3) .bar { background: var(--coral); }
+    .fine-print { max-width: 850px; margin: 18px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    footer { display: flex; justify-content: space-between; gap: 18px; padding: 16px clamp(20px, 5vw, 72px); border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+    footer strong { color: var(--ink); }
+    @media (max-width: 850px) {
+      .intro { align-items: start; flex-direction: column; }
+      .workspace { grid-template-columns: 1fr; }
+      .result-area { border-left: 0; border-top: 1px solid var(--line); padding: 24px 0 0; }
+    }
+    @media (max-width: 560px) {
+      header { min-height: 62px; }
+      .header-note { max-width: 125px; text-align: right; }
+      h1 { font-size: 29px; }
+      .field-grid, .metric-grid { grid-template-columns: 1fr; }
+      .metric-grid { gap: 16px; }
+      .dataset-kpis { grid-template-columns: 1fr 1fr; }
+      .dataset-grid { grid-template-columns: 1fr; gap: 24px; }
+      .category-row { grid-template-columns: minmax(95px, 1fr) 1.3fr auto; gap: 8px; }
+      footer { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand"><strong>ViralScope</strong><span>benchmark lab</span></div>
+    <div class="header-note">SMP-Image · text + context · local inference</div>
+  </header>
+  <main>
+    <section class="intro">
+      <div>
+        <h1>Estimate a post's benchmark popularity</h1>
+        <p>Compare lightweight models trained on historical post text and planned publishing context. This is a research estimate, not a forecast of live reach.</p>
+      </div>
+      <div class="scope-mark">Part 1<br>Image branch deferred</div>
+    </section>
+
+    <section class="workspace" aria-label="Prediction workspace">
+      <div>
+        <h2>Draft inputs</h2>
+        <form id="prediction-form">
+          <label for="title">Title
+            <input id="title" name="title" maxlength="300" placeholder="A short post title">
+          </label>
+          <label for="tags">Tags
+            <textarea id="tags" name="tags" maxlength="10000" placeholder="Separate tags with spaces or commas"></textarea>
+          </label>
+          <div class="field-grid">
+            <label for="category">Category
+              <select id="category" name="category" required>
+                <option value="">Choose a category</option>
+                <option>Animal</option><option>Electronics</option><option>Entertainment</option>
+                <option>Family</option><option>Fashion</option><option>Food</option>
+                <option>Holiday&amp;Celebrations</option><option>Social&amp;People</option>
+                <option>Travel&amp;Active&amp;Sports</option><option>Urban</option><option>Whether&amp;Season</option>
+              </select>
+            </label>
+            <label for="subcategory">Subcategory
+              <input id="subcategory" name="subcategory" maxlength="100" placeholder="Optional">
+            </label>
+          </div>
+          <div class="field-grid">
+            <label for="concept">Concept
+              <input id="concept" name="concept" maxlength="200" placeholder="Optional">
+            </label>
+            <label for="planned-at">Planned time (UTC)
+              <input id="planned-at" name="planned_at" type="datetime-local" required>
+            </label>
+          </div>
+          <label for="model">Model
+            <select id="model" name="model">
+              <option value="tfidf_ridge">Text · TF-IDF + Ridge</option>
+              <option value="context_catboost">Context · CatBoost</option>
+              <option value="text_context_ridge">Text + context · Ridge</option>
+            </select>
+          </label>
+          <div class="submit-row">
+            <button id="submit-button" type="submit">Estimate score</button>
+            <span class="form-note">No image, account, or live platform data is sent.</span>
+          </div>
+          <div id="form-error" class="error" role="alert"></div>
+        </form>
+      </div>
+
+      <section class="result-area" aria-live="polite">
+        <div class="result-head">
+          <div>
+            <h2>Model estimate</h2>
+            <div class="score-wrap"><span id="score" class="score">—</span><span class="score-unit">historical benchmark score</span></div>
+          </div>
+          <span id="result-model" class="sample-count"></span>
+        </div>
+        <div id="empty-state" class="empty-state">Enter draft details to run one local prediction.</div>
+        <ul id="explanations" class="explanation-list"></ul>
+        <p id="explanation-note" class="fine-print"></p>
+      </section>
+    </section>
+
+    <hr class="divider">
+    <section class="dataset-snapshot" aria-labelledby="dataset-title">
+      <div class="metrics-head">
+        <h2 id="dataset-title">Dataset snapshot</h2>
+        <div id="dataset-revision" class="sample-count">Loading audits…</div>
+      </div>
+      <div class="dataset-kpis">
+        <div class="dataset-kpi"><span>Full train labels</span><strong id="dataset-rows">—</strong><small>pinned training split</small></div>
+        <div class="dataset-kpi"><span>Mean popularity label</span><strong id="dataset-mean">—</strong><small>population SD <b id="dataset-std">—</b></small></div>
+        <div class="dataset-kpi"><span>Median label</span><strong id="dataset-median">—</strong><small>range <b id="dataset-range">—</b></small></div>
+        <div class="dataset-kpi"><span>Metadata sample</span><strong id="sample-rows">—</strong><small id="sample-title-missing">—</small></div>
+      </div>
+      <div class="dataset-grid">
+        <div>
+          <h3>Full-train target distribution · 305,613 labels</h3>
+          <div id="target-histogram" class="histogram" role="img" aria-label="Histogram of the full training label distribution"></div>
+          <div class="chart-axis"><span>1.00</span><span>Popularity label</span><span>16.56</span></div>
+        </div>
+        <div>
+          <h3 id="category-heading">Category frequency · sampled shards</h3>
+          <div id="category-bars" class="category-bars"></div>
+        </div>
+      </div>
+      <p class="fine-print">Target summary is a complete label-only scan. Metadata frequencies use seven evenly spaced shards (not a random sample); do not treat them as exact full-train proportions. No image bytes, raw text, or IDs are shown.</p>
+    </section>
+
+    <hr class="divider">
+    <section aria-labelledby="metrics-title">
+      <div class="metrics-head">
+        <h2 id="metrics-title">Chronological holdout</h2>
+        <div id="sample-count" class="sample-count">Loading evaluation…</div>
+      </div>
+      <div id="metrics" class="metric-grid"></div>
+      <p class="fine-print">SRC measures ranking agreement (higher is better). MAE is the average absolute error in label units (lower is better). Scores are from a seven-shard sample and a local time-ordered holdout, not the official test set. Feature contributions describe model behavior, not causes.</p>
+    </section>
+  </main>
+  <footer>
+    <strong>Powered by SMP Challenge</strong>
+    <span>Historical Flickr benchmark · local research demo · no live reach claim</span>
+  </footer>
+  <script>
+    const form = document.querySelector("#prediction-form");
+    const button = document.querySelector("#submit-button");
+    const errorBox = document.querySelector("#form-error");
+    const metricNames = {
+      tfidf_ridge: "Text · TF-IDF + Ridge",
+      context_catboost: "Context · CatBoost",
+      text_context_ridge: "Text + context · Ridge"
+    };
+
+    async function loadDataset() {
+      const response = await fetch("/api/dataset");
+      if (!response.ok) throw new Error("Dataset audit reports are unavailable.");
+      const data = await response.json();
+      document.querySelector("#dataset-rows").textContent = data.train_rows.toLocaleString();
+      document.querySelector("#dataset-mean").textContent = data.target.mean.toFixed(2);
+      document.querySelector("#dataset-std").textContent = data.target.std_population.toFixed(2);
+      document.querySelector("#dataset-median").textContent = data.target.quantiles["0.5"].toFixed(2);
+      document.querySelector("#dataset-range").textContent = `${data.target.min.toFixed(2)}–${data.target.max.toFixed(2)}`;
+      document.querySelector("#sample-rows").textContent = data.metadata_sample.rows.toLocaleString();
+      const missingRate = 100 * data.metadata_sample.missing_titles / data.metadata_sample.rows;
+      document.querySelector("#sample-title-missing").textContent = `${missingRate.toFixed(1)}% missing titles in sample`;
+      document.querySelector("#dataset-revision").textContent = `Revision ${data.revision.slice(0, 12)}`;
+      document.querySelector("#category-heading").textContent = `Category frequency · ${data.metadata_sample.shards_scanned} of ${data.metadata_sample.shards_available} shards`;
+
+      const histogram = document.querySelector("#target-histogram");
+      const maxCount = Math.max(...data.target.histogram_counts);
+      data.target.histogram_counts.forEach((count, index) => {
+        const bar = document.createElement("span");
+        bar.style.height = `${Math.max(3, count / maxCount * 100)}%`;
+        bar.title = `${count.toLocaleString()} labels in bin ${index + 1}`;
+        histogram.append(bar);
+      });
+
+      const categories = data.metadata_sample.categories;
+      const maxCategory = Math.max(...categories.map((item) => item.count));
+      const categoryRoot = document.querySelector("#category-bars");
+      categories.forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "category-row";
+        const name = document.createElement("span");
+        name.className = "category-name";
+        name.textContent = item.value;
+        const track = document.createElement("div");
+        track.className = "category-track";
+        const fill = document.createElement("div");
+        fill.className = "category-fill";
+        fill.style.width = `${item.count / maxCategory * 100}%`;
+        track.append(fill);
+        const count = document.createElement("b");
+        count.className = "category-count";
+        count.textContent = item.count.toLocaleString();
+        row.append(name, track, count);
+        categoryRoot.append(row);
+      });
+    }
+
+    async function loadMetrics() {
+      const response = await fetch("/api/metrics");
+      if (!response.ok) throw new Error("Evaluation metrics are unavailable.");
+      const data = await response.json();
+      document.querySelector("#sample-count").textContent = `${data.evaluation.train_rows.toLocaleString()} train / ${data.evaluation.holdout_rows.toLocaleString()} holdout rows`;
+      const root = document.querySelector("#metrics");
+      ["tfidf_ridge", "context_catboost", "text_context_ridge"].forEach((key) => {
+        const values = data.metrics[key].holdout;
+        const section = document.createElement("article");
+        section.className = "metric-model";
+        const heading = document.createElement("h3");
+        heading.textContent = metricNames[key];
+        section.append(heading);
+        [["SRC", values.src, Math.max(0, values.src ?? 0)], ["MAE", values.mae, Math.max(0, 1 - values.mae / 3)]].forEach(([name, value, width]) => {
+          const row = document.createElement("div");
+          row.className = "metric-row";
+          const label = document.createElement("span");
+          label.textContent = name;
+          const score = document.createElement("b");
+          score.textContent = value == null ? "n/a" : Number(value).toFixed(3);
+          row.append(label, score);
+          section.append(row);
+          const track = document.createElement("div");
+          track.className = "bar-track";
+          const bar = document.createElement("div");
+          bar.className = "bar";
+          bar.style.width = `${Math.max(0, Math.min(1, width)) * 100}%`;
+          track.append(bar);
+          section.append(track);
+        });
+        root.append(section);
+      });
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      errorBox.textContent = "";
+      button.disabled = true;
+      button.textContent = "Estimating…";
+      document.querySelector("#empty-state").hidden = true;
+      const plannedAt = form.elements.planned_at.value;
+      const payload = {
+        title: form.elements.title.value,
+        tags: form.elements.tags.value,
+        category: form.elements.category.value,
+        subcategory: form.elements.subcategory.value,
+        concept: form.elements.concept.value,
+        planned_at: `${plannedAt}:00Z`,
+        model: form.elements.model.value
+      };
+      try {
+        const response = await fetch("/api/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.detail || "Prediction failed.");
+        document.querySelector("#score").textContent = result.prediction.toFixed(2);
+        document.querySelector("#result-model").textContent = metricNames[result.model];
+        document.querySelector("#explanation-note").textContent = result.explanation_note;
+        const list = document.querySelector("#explanations");
+        list.replaceChildren();
+        result.contributions.forEach((item) => {
+          const row = document.createElement("li");
+          const feature = document.createElement("span");
+          feature.textContent = item.feature;
+          const value = document.createElement("b");
+          value.className = item.contribution >= 0 ? "positive" : "negative";
+          value.textContent = `${item.contribution >= 0 ? "+" : ""}${item.contribution.toFixed(3)}`;
+          row.append(feature, value);
+          list.append(row);
+        });
+      } catch (error) {
+        errorBox.textContent = error.message;
+      } finally {
+        button.disabled = false;
+        button.textContent = "Estimate score";
+      }
+    });
+
+    loadMetrics().catch((error) => {
+      document.querySelector("#sample-count").textContent = error.message;
+    });
+    loadDataset().catch((error) => {
+      document.querySelector("#dataset-revision").textContent = error.message;
+    });
+  </script>
+</body>
+</html>

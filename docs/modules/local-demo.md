@@ -1,0 +1,45 @@
+# Module 4: Local Inference Demo
+
+## Status
+
+Implemented as a FastAPI service and responsive browser UI. The service loads the saved baseline models once per process, reports held-out comparisons, accepts planned-post inputs, and returns model-specific feature contributions. The demo is intended for local project review, not public deployment.
+
+## Purpose and Boundaries
+
+The demo turns a draft title, tags, category/context, and planned UTC publication time into a prediction of the historical SMP popularity label. It does not retrieve platform data, publish posts, access accounts, accept images, or predict current/live reach. No dataset images or user profiles are served.
+
+The selected model can be TF-IDF + Ridge, context CatBoost, or text + context Ridge. The response includes the selected model, predicted score, planned time normalized to UTC, and up to six strongest signed feature contributions. These are model associations, not causes or guaranteed outcomes.
+
+## API
+
+- `GET /`: review UI.
+- `GET /api/health`: local process health.
+- `GET /api/dataset`: full-train label summary/histogram and sample-only category/missing-title aggregates.
+- `GET /api/metrics`: train/holdout counts and model evaluation metrics from `artifacts/baseline-metrics.json`.
+- `POST /api/predict`: JSON input with `title`, `tags`, `category`, optional `subcategory` and `concept`, ISO `planned_at`, and model name.
+
+The service expects trained files under `artifacts/models/`; it returns HTTP 503 with a clear message if they are missing. Pydantic bounds text lengths and model names. Naive input datetimes are interpreted as UTC; the UI labels the planned time as UTC and submits an explicit UTC offset.
+
+## Run
+
+From the project root, after caching a sample and training models:
+
+```bash
+.venv/bin/python -m uvicorn viralscope.demo_app:app --host 127.0.0.1 --port 8000
+```
+
+Open `http://127.0.0.1:8000`. The server binds to loopback by default and is not exposed to the network. The page shows the full-train target distribution, clearly labeled sampled metadata category frequencies, chronological holdout SRC/MAE comparisons, and an estimate/explanation after submitting a draft.
+
+## Validation
+
+The API was exercised in-process against all three saved models; each returned HTTP 200, a finite prediction, and contribution entries. Metrics returned HTTP 200 with 8,546 holdout rows. Unit tests cover UTC normalization and feature mapping. Run the full suite with:
+
+```bash
+.venv/bin/python -m unittest discover -s tests -v
+```
+
+## License and Limitations
+
+The page visibly displays **Powered by SMP Challenge** and the repository includes the required attribution in [Notice](../../Notice). The app does not bundle the gated agreement or AUP, whose current full terms still require supervisor review. Do not deploy publicly or distribute model/data artifacts until the supervisor confirms license, AUP, attribution, privacy, and distribution requirements. Keep `data/` and `artifacts/models/` local; both are gitignored.
+
+Predictions inherit the constraints of a seven-shard training sample and one chronological holdout that may share users across partitions. They are historical Flickr benchmark estimates and should not be interpreted as causal claims, user judgments, or platform-wide forecasts. Images remain deferred pending license review and a separate model milestone.
