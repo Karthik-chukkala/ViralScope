@@ -134,4 +134,4 @@ This access module is complete when the license summary and revision are recorde
 
 ## Next Step
 
-The access audit, full label scan, seven-shard metadata sample, initial text/context model ladder, and local review demo are implemented. The next work is to broaden EDA, improve evaluation with a user-aware check and additional temporal cutoffs, and review the complete license/AUP with the supervisor before any public deployment or image use. Do not score the public test split; its sampled `-1` labels are withheld placeholders.
+The access audit, full label scan, seven-shard metadata sample, initial text/context model ladder, and local review demo are implemented. Chronological sensitivity and a separate user-disjoint evaluation are also available. Next, broaden EDA, consider a combined future-time/unseen-user protocol, and review the complete license/AUP with the supervisor before any public deployment or image use. Do not score the public test split; its sampled `-1` labels are withheld placeholders.

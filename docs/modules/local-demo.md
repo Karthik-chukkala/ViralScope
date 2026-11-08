@@ -16,6 +16,7 @@ The selected model can be TF-IDF + Ridge, context CatBoost, or text + context Ri
 - `GET /api/health`: local process health.
 - `GET /api/dataset`: full-train label summary/histogram and sample-only category/missing-title aggregates.
 - `GET /api/metrics`: chronological metrics/diagnostics plus aggregate user-disjoint metrics from `artifacts/baseline-metrics.json` and `artifacts/user-aware-metrics.json`, when present.
+- The same metrics response includes the 15/20/25% temporal-sensitivity summary from `artifacts/temporal-sensitivity.json`, when present.
 - `GET /api/diagnostics/{filename}`: one of the allowlisted holdout diagnostic PNGs.
 - `POST /api/predict`: JSON input with `title`, `tags`, `category`, optional `subcategory` and `concept`, ISO `planned_at`, and model name.
 
@@ -29,7 +30,7 @@ From the project root, after caching a sample and training models:
 .venv/bin/python -m uvicorn viralscope.demo_app:app --host 127.0.0.1 --port 8000
 ```
 
-Open `http://127.0.0.1:8000`. The server binds to loopback by default and is not exposed to the network. The page shows the full-train target distribution, clearly labeled sampled metadata category frequencies, separate chronological and unseen-user SRC/MAE comparisons, holdout diagnostic plots, and a synthetic random-example control that fills draft fields and selects a model. Users can edit the example before requesting an estimate/explanation.
+Open `http://127.0.0.1:8000`. The server binds to loopback by default and is not exposed to the network. The page shows the full-train target distribution, clearly labeled sampled metadata category frequencies, chronological, unseen-user, and temporal-sensitivity model comparisons, holdout diagnostic plots, and a synthetic random-example control that fills draft fields and selects a model. Users can edit the example before requesting an estimate/explanation.
 
 ## Validation
 

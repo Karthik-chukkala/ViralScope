@@ -17,6 +17,14 @@ class DemoAppTests(unittest.TestCase):
         self.assertEqual(user_aware["evaluation"]["holdout_user_count"], 2196)
         self.assertNotIn('"Uid"', json.dumps(user_aware))
 
+    def test_metrics_api_exposes_temporal_sensitivity_runs(self) -> None:
+        response = TestClient(app).get("/api/metrics")
+
+        self.assertEqual(response.status_code, 200)
+        runs = response.json()["temporal_sensitivity"]["runs"]
+        self.assertEqual([run["holdout_fraction"] for run in runs], [0.15, 0.2, 0.25])
+        self.assertEqual([run["holdout_rows"] for run in runs], [6410, 8546, 10683])
+
     def test_feature_builder_uses_utc_and_combines_text_fields(self) -> None:
         request = PredictionRequest(
             title="Coastal walk",

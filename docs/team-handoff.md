@@ -77,6 +77,8 @@ The complementary user-disjoint split has 33,680 train posts from 8,780 users an
 
 The fused model leads on this unseen-user holdout, while all models have weaker text SRC/MAE than on the chronological holdout. This is a different split population, not proof that user novelty alone caused the change. The report is `artifacts/user-aware-metrics.json`; it contains aggregate user counts/overlap only, not raw user IDs.
 
+Temporal sensitivity was checked at 15%, 20%, and 25% holdout tails. TF-IDF Ridge has the best MAE at all three cutoffs (1.606 / 1.623 / 1.661); SRC leadership moves from TF-IDF at 15% to text + context at 20% and 25%. These nested windows overlap and are sensitivity checks, not independent test sets. The aggregate report is `artifacts/temporal-sensitivity.json`; temporary model artifacts are discarded after the run.
+
 ## 5. Run It
 
 Activate or use the existing project environment. The current setup is WSL Ubuntu 24.04, Python 3.12, with an RTX 4050; these baselines run on CPU and need no GPU.
@@ -94,6 +96,12 @@ HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.sample_cache --sam
 # Evaluate a disjoint user holdout; user IDs are read in memory and never saved
 HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.user_aware_eval --workers 4
 
+# Check temporal ranking stability without persisting extra model artifacts
+.venv/bin/python -u -m viralscope.temporal_sensitivity --workers 4
+
+# Check temporal ranking stability without persisting extra model artifacts
+.venv/bin/python -u -m viralscope.temporal_sensitivity --workers 4
+
 # Run unit tests
 .venv/bin/python -m unittest discover -s tests -v
 
@@ -105,13 +113,13 @@ Hugging Face commands require the local credential. `HF_HUB_DOWNLOAD_TIMEOUT=120
 
 The API routes are `GET /api/health`, `GET /api/dataset`, `GET /api/metrics`, `GET /api/diagnostics/{filename}`, and `POST /api/predict`. Prediction input is title, tags, category, optional subcategory/concept, planned UTC datetime, and model name (`tfidf_ridge`, `context_catboost`, or `text_context_ridge`).
 
-Latest test result: **17 tests passed**. API smoke checks returned HTTP 200 for health, dataset summary, chronological/user-aware metrics, diagnostic plots, and predictions/explanations from all three saved models.
+Latest test result: **19 tests passed**. API smoke checks returned HTTP 200 for health, dataset summary, chronological/user-aware/temporal metrics, diagnostic plots, and predictions/explanations from all three saved models.
 
 ## 6. What Remains
 
 Prioritize work in this order:
 
-1. **Strengthen evaluation:** compare multiple temporal cutoffs and design a combined future-time/unseen-user protocol. The existing user-disjoint check is a random user-group split, not a future-time test.
+1. **Strengthen evaluation:** consider a combined future-time/unseen-user protocol and keep model tuning on a separate validation split. The existing user-disjoint check is a random user-group split, not a future-time test; the three temporal sensitivity windows are nested, not independent.
 2. **Broaden EDA:** add tag/title length and coverage analysis, fuller temporal summaries, missing/type/range checks, residual and per-category model error slices, and concise interpretations. Continue to label shard-derived metadata results as sample-only.
 3. **Validate explanations:** inspect linear term contributions and CatBoost SHAP values on representative inputs; test explanation stability and avoid causal wording.
 4. **Reproducibility:** record/pin the successful dependency versions and add a concise offline review procedure with a tested sample input.

@@ -232,7 +232,7 @@ Suggested module documents as the project grows: dataset access and audit; clean
 ## 12. Current Implementation Decisions
 
 1. Use pinned `smpchallenge/SMP-Image` revision `f131dba653a05c0e3c6294388f81ed3fbd9c71a0`; retain the supplied `label` as target. Exact label snapshot/formula semantics are not fully verified.
-2. Do not score the public test split: sampled labels are `-1`. Report both a chronological holdout and a separate random user-group holdout from the same seven-shard labeled sample. The user-group split has zero user overlap but is not time-ordered; a combined future-time/unseen-user protocol remains future work.
+2. Do not score the public test split: sampled labels are `-1`. Report chronological holdouts at several tail cutoffs plus a separate random user-group holdout from the same seven-shard labeled sample. The user-group split has zero user overlap but is not time-ordered; a combined future-time/unseen-user protocol remains future work.
 3. Part 1 uses title, tags, category/subcategory/concept, and planned publication time. Profile snapshots, engagement counts, IDs, locations, and images are excluded.
 4. The review demo is one local FastAPI app serving its UI and inference API. It does not expose a public network interface by default.
 5. Continuous regression is primary; no separate viral threshold/classifier is implemented.

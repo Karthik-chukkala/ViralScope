@@ -9,9 +9,31 @@ from viralscope.train_baselines import (
     summarize_residuals,
     user_aware_split,
 )
+from viralscope.temporal_sensitivity import _best_models
 
 
 class TrainBaselineTests(unittest.TestCase):
+    def test_temporal_best_model_counts_cover_each_cutoff(self) -> None:
+        runs = [
+            {
+                "holdout_metrics": {
+                    "text": {"src": 0.6, "mae": 1.5},
+                    "context": {"src": 0.3, "mae": 1.8},
+                }
+            },
+            {
+                "holdout_metrics": {
+                    "text": {"src": 0.4, "mae": 1.9},
+                    "context": {"src": 0.5, "mae": 1.7},
+                }
+            },
+        ]
+
+        self.assertEqual(
+            _best_models(runs),
+            {"src_winner_counts": {"context": 1, "text": 1}, "mae_winner_counts": {"text": 1, "context": 1}},
+        )
+
     def test_user_aware_split_is_deterministic_and_has_no_group_overlap(self) -> None:
         features = pd.DataFrame({"value": range(30)})
         labels = np.arange(30, dtype=np.float64)

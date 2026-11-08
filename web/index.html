@@ -108,6 +108,10 @@
     .metric-model:nth-child(3) .bar { background: var(--coral); }
     .fine-print { max-width: 850px; margin: 18px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
     .diagnostics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+    .temporal-runs { display: grid; gap: 8px; }
+    .temporal-row { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(160px, 1fr) minmax(170px, 1fr) minmax(170px, 1fr); gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); font-size: 12px; }
+    .temporal-row span { min-width: 0; overflow-wrap: anywhere; }
+    .temporal-row strong { color: var(--ink); }
     .diagnostic-figure { min-width: 0; margin: 0; }
     .diagnostic-figure:last-child { grid-column: 1 / -1; }
     .diagnostic-figure img { display: block; width: 100%; height: auto; border: 1px solid var(--line); background: white; }
@@ -130,6 +134,7 @@
       .category-row { grid-template-columns: minmax(95px, 1fr) 1.3fr auto; gap: 8px; }
       .diagnostics { grid-template-columns: 1fr; }
       .diagnostic-figure:last-child { grid-column: auto; }
+      .temporal-row { grid-template-columns: 1fr 1fr; gap: 8px; }
       footer { flex-direction: column; }
     }
   </style>
@@ -254,6 +259,16 @@
       </div>
       <div id="user-aware-metrics" class="metric-grid"></div>
       <p class="fine-print">Users are held out as groups and are not model features. This random group split tests unseen-user generalization, not future-time generalization; compare it with the separate chronological holdout above.</p>
+    </section>
+
+    <hr id="temporal-sensitivity-divider" class="divider" hidden>
+    <section id="temporal-sensitivity" aria-labelledby="temporal-title" hidden>
+      <div class="metrics-head">
+        <h2 id="temporal-title">Temporal cutoff sensitivity</h2>
+        <div class="sample-count">Nested tail holdouts</div>
+      </div>
+      <div id="temporal-runs" class="temporal-runs"></div>
+      <p class="fine-print">Each holdout is the final fraction of the same seven-shard sample. These windows overlap and are sensitivity checks, not independent test sets.</p>
     </section>
 
     <hr class="divider">
@@ -434,6 +449,30 @@
         document.querySelector("#user-aware-results").hidden = false;
         document.querySelector("#user-aware-count").textContent = `${evaluation.train_rows.toLocaleString()} train / ${evaluation.holdout_rows.toLocaleString()} unseen-user holdout posts · ${evaluation.holdout_user_count.toLocaleString()} held-out users · ${evaluation.user_overlap_count} overlap`;
         renderMetricCards(document.querySelector("#user-aware-metrics"), data.user_aware.metrics);
+      }
+      if (data.temporal_sensitivity) {
+        document.querySelector("#temporal-sensitivity-divider").hidden = false;
+        document.querySelector("#temporal-sensitivity").hidden = false;
+        const root = document.querySelector("#temporal-runs");
+        data.temporal_sensitivity.runs.forEach((run) => {
+          const metrics = run.holdout_metrics;
+          const srcWinner = Object.keys(metrics).reduce((best, name) =>
+            metrics[name].src != null && (best == null || metrics[name].src > metrics[best].src) ? name : best, null);
+          const maeWinner = Object.keys(metrics).reduce((best, name) =>
+            best == null || metrics[name].mae < metrics[best].mae ? name : best, null);
+          const row = document.createElement("div");
+          row.className = "temporal-row";
+          const label = document.createElement("strong");
+          label.textContent = `${Math.round(run.holdout_fraction * 100)}% tail · ${run.holdout_rows.toLocaleString()} posts`;
+          const cutoff = document.createElement("span");
+          cutoff.textContent = `Cutoff ${run.cutoff_utc.slice(0, 10)}`;
+          const src = document.createElement("span");
+          src.textContent = `SRC leader: ${metricNames[srcWinner]} (${metrics[srcWinner].src.toFixed(3)})`;
+          const mae = document.createElement("span");
+          mae.textContent = `MAE leader: ${metricNames[maeWinner]} (${metrics[maeWinner].mae.toFixed(3)})`;
+          row.append(label, cutoff, src, mae);
+          root.append(row);
+        });
       }
     }
 

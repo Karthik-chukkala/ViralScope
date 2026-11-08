@@ -23,6 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MODEL_DIR = ROOT / "artifacts/models"
 METRICS_PATH = ROOT / "artifacts/baseline-metrics.json"
 USER_AWARE_METRICS_PATH = ROOT / "artifacts/user-aware-metrics.json"
+TEMPORAL_METRICS_PATH = ROOT / "artifacts/temporal-sensitivity.json"
 TARGET_AUDIT_PATH = ROOT / "artifacts/train-target-audit.json"
 METADATA_EDA_PATH = ROOT / "artifacts/metadata-eda.json"
 DIAGNOSTIC_DIR = ROOT / "artifacts/diagnostics"
@@ -140,6 +141,13 @@ def metrics() -> dict[str, Any]:
         response["user_aware"] = {
             "evaluation": user_report["evaluation"],
             "metrics": user_report["metrics"],
+        }
+    if TEMPORAL_METRICS_PATH.exists():
+        temporal_report = json.loads(TEMPORAL_METRICS_PATH.read_text(encoding="utf-8"))
+        response["temporal_sensitivity"] = {
+            "protocol": temporal_report["protocol"],
+            "runs": temporal_report["runs"],
+            "best_model_winner_counts": temporal_report["best_model_winner_counts"],
         }
     return response
 

@@ -253,6 +253,7 @@ def train_baselines(
     split_strategy: str = "chronological",
     groups: np.ndarray | None = None,
     diagnostic_dir: Path = DEFAULT_DIAGNOSTIC_DIR,
+    holdout_fraction: float = 0.2,
 ) -> dict[str, Any]:
     if workers < 1:
         raise ValueError("workers must be positive")
@@ -262,7 +263,7 @@ def train_baselines(
     cutoff: int | None
     if split_strategy == "chronological":
         train_indexes, holdout_indexes, cutoff = chronological_split(
-            features, labels, timestamps
+            features, labels, timestamps, holdout_fraction=holdout_fraction
         )
         protocol = "chronological local holdout from sampled training shards"
     elif split_strategy == "user":
@@ -273,7 +274,7 @@ def train_baselines(
             raise ValueError("one group ID is required for each cached sample row")
         valid_groups = source_groups[features.index.to_numpy()]
         train_indexes, holdout_indexes = user_aware_split(
-            features, labels, valid_groups
+            features, labels, valid_groups, holdout_fraction=holdout_fraction
         )
         cutoff = None
         protocol = "user-disjoint local holdout from sampled training shards"
@@ -413,7 +414,7 @@ def train_baselines(
     )
     evaluation: dict[str, Any] = {
         "protocol": protocol,
-        "holdout_fraction_requested": 0.2,
+        "holdout_fraction_requested": holdout_fraction,
         "holdout_fraction_unit": "post_rows",
         "split_unit": "post_row",
         "cutoff_utc": (
@@ -472,6 +473,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
     parser.add_argument("--model-dir", type=Path, default=DEFAULT_MODEL_DIR)
     parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--holdout-fraction", type=float, default=0.2)
     args = parser.parse_args(argv)
     report = train_baselines(
         data_path=args.data,
@@ -479,6 +481,7 @@ def main(argv: list[str] | None = None) -> int:
         report_path=args.report,
         model_dir=args.model_dir,
         workers=args.workers,
+        holdout_fraction=args.holdout_fraction,
     )
     print(f"Train rows: {report['evaluation']['train_rows']}")
     print(f"Holdout rows: {report['evaluation']['holdout_rows']}")

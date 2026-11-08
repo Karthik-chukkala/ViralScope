@@ -70,6 +70,18 @@ The group holdout is randomly assigned by user and is not time-ordered. It compl
 
 The aggregate report is `artifacts/user-aware-metrics.json`; model files and plots are kept in `artifacts/models/user-aware/` and `artifacts/diagnostics/user-aware/`. The report contains user counts and overlap only, never raw IDs.
 
+## Temporal Sensitivity
+
+`viralscope.temporal_sensitivity` evaluates chronological tail holdouts of 15%, 20%, and 25% using the same sample and model settings. It writes one aggregate report to `artifacts/temporal-sensitivity.json`; temporary models and plots are deleted after each run.
+
+| Holdout tail | Rows | Cutoff (UTC) | TF-IDF SRC / MAE | Context SRC / MAE | Text + context SRC / MAE | Best SRC | Best MAE |
+| ---: | ---: | --- | ---: | ---: | ---: | --- | --- |
+| 15% | 6,410 | 2016-01-27 | 0.576 / 1.606 | 0.312 / 1.926 | 0.567 / 1.660 | TF-IDF | TF-IDF |
+| 20% | 8,546 | 2016-01-11 | 0.575 / 1.623 | 0.317 / 1.898 | 0.578 / 1.642 | Text + context | TF-IDF |
+| 25% | 10,683 | 2015-12-31 | 0.528 / 1.661 | 0.324 / 1.856 | 0.556 / 1.679 | Text + context | TF-IDF |
+
+The holdouts are nested tails from the same seven-shard sample and overlap; they are sensitivity checks, not independent test sets. TF-IDF has the best MAE at all three windows, while SRC leadership changes at the 20% window. The ranking is therefore not fully stable across cutoffs. The chronological split currently uses a fixed random seed only for the separate user-group split; the temporal boundaries themselves are deterministic.
+
 The complete report is `artifacts/baseline-metrics.json`. Models are stored under `artifacts/models/` and included with the research repository under the SMP Challenge Community License. Scores are not official test results and do not establish expected performance on the entire training split.
 
 ## Run and Reproduce
@@ -80,6 +92,7 @@ Create the cache and train the baselines:
 HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.sample_cache --sample-shards 7 --workers 4
 .venv/bin/python -u -m viralscope.train_baselines --workers 4
 HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.user_aware_eval --workers 4
+.venv/bin/python -u -m viralscope.temporal_sensitivity --workers 4
 ```
 
 The cache and trained models are local artifacts; the commands do not download image bytes. Run tests with:
@@ -91,8 +104,8 @@ The cache and trained models are local artifacts; the commands do not download i
 ## Limitations and Next Checks
 
 - Increase sample coverage only after the current pipeline is reproducible; do not jump to the full image-bearing Parquet download for these feature groups.
-- Add validation-only tuning and compare stability across multiple temporal cutoffs before selecting a final model.
+- Tune hyperparameters only on a separate validation split; do not select a final model by repeatedly consulting holdout windows.
 - Design a combined future-time/unseen-user protocol if that is the intended deployment claim.
 - Validate contribution explanations across representative examples and inspect them for text artifacts before any broader release.
-- Compare the generated residual and category plots at additional temporal cutoffs before selecting a model.
+- Generate and inspect residual/category plots for further cutoffs if they are used for model selection.
 - Keep image training deferred until the supervisor reviews the license conditions for image use and display.
