@@ -43,8 +43,8 @@ The published training sample includes raw title/tag text but excludes IDs, prof
 1. **Dataset access and audit:** pinned revision, license/provenance report, split sizes, and the complete label-only scan. Code: `viralscope/dataset_audit.py`, `viralscope/target_audit.py`.
 2. **Sample metadata EDA:** aggregate missingness, ID uniqueness, categories, concepts, monthly counts, and title/tag lengths. Code: `viralscope/metadata_eda.py`; output: `artifacts/metadata-eda.json`.
 3. **Local modeling cache:** selected non-image columns plus `label`, saved to `data/train-sample.parquet`; provenance is in `data/train-sample-manifest.json`. Code: `viralscope/sample_cache.py`.
-4. **Baseline ladder:** median, TF-IDF + Ridge, context CatBoost, and text + context Ridge. Code: `viralscope/train_baselines.py`; metric report: `artifacts/baseline-metrics.json`; model files: `artifacts/models/`.
-5. **Inference and review site:** FastAPI serves the UI, aggregate dataset snapshot/histogram, category sample chart, holdout metrics, residual/category diagnostics, and prediction endpoint. The form prefills a synthetic example and can shuffle to another draft/model without typing. Text models explain signed feature contributions; CatBoost uses SHAP values. Code: `viralscope/demo_app.py`, `web/index.html`.
+4. **Baseline ladder:** median, TF-IDF + Ridge, context CatBoost, and text + context Ridge. Chronological and user-disjoint holdouts are both evaluated. Code: `viralscope/train_baselines.py`, `viralscope/user_aware_eval.py`; reports: `artifacts/baseline-metrics.json`, `artifacts/user-aware-metrics.json`; model files: `artifacts/models/`.
+5. **Inference and review site:** FastAPI serves the UI, aggregate dataset snapshot/histogram, category sample chart, both holdout metric sets, residual/category diagnostics, and prediction endpoint. The form prefills a synthetic example and can shuffle to another draft/model without typing. Text models explain signed feature contributions; CatBoost uses SHAP values. Code: `viralscope/demo_app.py`, `web/index.html`.
 6. **Module documentation:** [Dataset Access and Audit](modules/dataset-access-and-audit.md), [Cleaning and EDA](modules/cleaning-and-eda.md), [Modeling Baselines](modules/modeling-baselines.md), and [Local Demo](modules/local-demo.md).
 
 The local site is currently running on loopback at port 8000. It was checked in a browser at desktop and mobile widths; form submission, dataset visualizations, holdout diagnostic plots, and explanations work without horizontal overflow.
@@ -64,7 +64,18 @@ Text + context slightly improves SRC over text alone, but is slightly worse on M
 
 The holdout diagnostic report shows mean prediction errors of +0.543 for TF-IDF Ridge, +0.131 for context CatBoost, and +0.537 for text + context Ridge (positive means overprediction). Within two label units, the models cover 68.4%, 59.1%, and 67.2% of holdout rows, respectively. Category MAE slices and actual/predicted and residual plots are saved under `artifacts/diagnostics/`; these remain sample-only diagnostics.
 
-The split is chronological, but it is **not user-independent**: user IDs were omitted from the modeling cache, so user overlap cannot be measured. Before making an unseen-user generalization claim, add a separate split-only ID column and evaluate a user-aware protocol without passing IDs into the model. The seven-shard sampling method is another important limitation.
+The chronological split is **not user-independent**. A separate random user-group holdout now has zero user overlap, but is not time-ordered. A combined future-time/unseen-user protocol and the seven-shard sampling method remain important limitations.
+
+The complementary user-disjoint split has 33,680 train posts from 8,780 users and 9,050 holdout posts from 2,196 users, with zero user overlap. The 20% split fraction applies to user groups, so the resulting holdout row share is approximate.
+
+| Model | Unseen-user SRC | Unseen-user MAE | Unseen-user RMSE | Unseen-user R² |
+| --- | ---: | ---: | ---: | ---: |
+| Median | n/a | 2.085 | 2.626 | -0.022 |
+| TF-IDF + Ridge | 0.443 | 1.835 | 2.336 | 0.191 |
+| Context CatBoost | 0.428 | 1.890 | 2.395 | 0.150 |
+| Text + context Ridge | 0.548 | 1.775 | 2.223 | 0.268 |
+
+The fused model leads on this unseen-user holdout, while all models have weaker text SRC/MAE than on the chronological holdout. This is a different split population, not proof that user novelty alone caused the change. The report is `artifacts/user-aware-metrics.json`; it contains aggregate user counts/overlap only, not raw user IDs.
 
 ## 5. Run It
 
@@ -80,6 +91,9 @@ HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.sample_cache --sam
 # Train models and refresh metrics
 .venv/bin/python -u -m viralscope.train_baselines --workers 4
 
+# Evaluate a disjoint user holdout; user IDs are read in memory and never saved
+HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.user_aware_eval --workers 4
+
 # Run unit tests
 .venv/bin/python -m unittest discover -s tests -v
 
@@ -91,13 +105,13 @@ Hugging Face commands require the local credential. `HF_HUB_DOWNLOAD_TIMEOUT=120
 
 The API routes are `GET /api/health`, `GET /api/dataset`, `GET /api/metrics`, `GET /api/diagnostics/{filename}`, and `POST /api/predict`. Prediction input is title, tags, category, optional subcategory/concept, planned UTC datetime, and model name (`tfidf_ridge`, `context_catboost`, or `text_context_ridge`).
 
-Latest test result: **14 tests passed**. API smoke checks returned HTTP 200 for health, dataset summary, metrics, diagnostic plots, and predictions/explanations from all three saved models.
+Latest test result: **17 tests passed**. API smoke checks returned HTTP 200 for health, dataset summary, chronological/user-aware metrics, diagnostic plots, and predictions/explanations from all three saved models.
 
 ## 6. What Remains
 
 Prioritize work in this order:
 
-1. **Strengthen evaluation:** use a split-only `Uid` column for user-aware evaluation, keep it out of model features, report user overlap, and compare more than one temporal cutoff. Preserve the current holdout as a reference.
+1. **Strengthen evaluation:** compare multiple temporal cutoffs and design a combined future-time/unseen-user protocol. The existing user-disjoint check is a random user-group split, not a future-time test.
 2. **Broaden EDA:** add tag/title length and coverage analysis, fuller temporal summaries, missing/type/range checks, residual and per-category model error slices, and concise interpretations. Continue to label shard-derived metadata results as sample-only.
 3. **Validate explanations:** inspect linear term contributions and CatBoost SHAP values on representative inputs; test explanation stability and avoid causal wording.
 4. **Reproducibility:** record/pin the successful dependency versions and add a concise offline review procedure with a tested sample input.

@@ -1,0 +1,403 @@
+{
+  "generated_at_utc": "2026-11-08T04:10:34.827016+00:00",
+  "dataset": {
+    "generated_at_utc": "2026-11-07T16:59:28.419279+00:00",
+    "dataset": "smpchallenge/SMP-Image",
+    "revision": "f131dba653a05c0e3c6294388f81ed3fbd9c71a0",
+    "split": "train",
+    "rows": 42730,
+    "columns": [
+      "Postdate",
+      "Category",
+      "Subcategory",
+      "Concept",
+      "Title",
+      "Alltags",
+      "label"
+    ],
+    "sample_method": "evenly_spaced_shards",
+    "shards_available": 49,
+    "shards_selected": [
+      "data/train-00000.parquet",
+      "data/train-00008.parquet",
+      "data/train-00016.parquet",
+      "data/train-00024.parquet",
+      "data/train-00032.parquet",
+      "data/train-00040.parquet",
+      "data/train-00048.parquet"
+    ],
+    "images_downloaded": false,
+    "profile_and_location_fields_cached": false,
+    "local_cache_contains_post_text": true
+  },
+  "evaluation": {
+    "protocol": "user-disjoint local holdout from sampled training shards",
+    "holdout_fraction_requested": 0.2,
+    "holdout_fraction_unit": "users",
+    "split_unit": "user_group",
+    "cutoff_utc": null,
+    "valid_rows": 42730,
+    "train_rows": 33680,
+    "holdout_rows": 9050,
+    "official_test_scored": false,
+    "train_user_count": 8780,
+    "holdout_user_count": 2196,
+    "user_overlap_count": 0,
+    "random_seed": 42
+  },
+  "metrics": {
+    "median": {
+      "train": {
+        "src": null,
+        "mae": 2.047311756598836,
+        "rmse": 2.5711641346698073,
+        "r2": -0.0029628039037854492
+      },
+      "holdout": {
+        "src": null,
+        "mae": 2.085499454927708,
+        "rmse": 2.6257183069742225,
+        "r2": -0.022099001084885384
+      }
+    },
+    "tfidf_ridge": {
+      "train": {
+        "src": 0.9349336333918448,
+        "mae": 0.7108659093143979,
+        "rmse": 1.0602237116298037,
+        "r2": 0.8294623595452667
+      },
+      "holdout": {
+        "src": 0.44284844241605703,
+        "mae": 1.8352422381606026,
+        "rmse": 2.3359414413351236,
+        "r2": 0.19105200594971183
+      }
+    },
+    "context_catboost": {
+      "train": {
+        "src": 0.7799212508292445,
+        "mae": 1.177372984633567,
+        "rmse": 1.6758685754889426,
+        "r2": 0.5739062744180397
+      },
+      "holdout": {
+        "src": 0.4277550371385013,
+        "mae": 1.8900675351679952,
+        "rmse": 2.3950600752855045,
+        "r2": 0.14958772131378706
+      }
+    },
+    "text_context_ridge": {
+      "train": {
+        "src": 0.9385900025370679,
+        "mae": 0.6553876343468876,
+        "rmse": 0.982496222035206,
+        "r2": 0.8535508004815024
+      },
+      "holdout": {
+        "src": 0.5477302671467784,
+        "mae": 1.77473892256052,
+        "rmse": 2.2225996797217893,
+        "r2": 0.2676491425161658
+      }
+    }
+  },
+  "diagnostics": {
+    "residuals": {
+      "tfidf_ridge": {
+        "rows": 9050,
+        "mean_error_prediction_minus_actual": 0.3730645314103693,
+        "median_absolute_error": 1.4605251610171237,
+        "p90_absolute_error": 3.8913779993853073,
+        "p95_absolute_error": 4.895037234660996,
+        "within_1_label_unit": 0.35790055248618785,
+        "within_2_label_units": 0.6176795580110497
+      },
+      "context_catboost": {
+        "rows": 9050,
+        "mean_error_prediction_minus_actual": 0.09645651233389138,
+        "median_absolute_error": 1.5212168979009868,
+        "p90_absolute_error": 4.051627093026102,
+        "p95_absolute_error": 4.908265293295113,
+        "within_1_label_unit": 0.32629834254143647,
+        "within_2_label_units": 0.6264088397790055
+      },
+      "text_context_ridge": {
+        "rows": 9050,
+        "mean_error_prediction_minus_actual": 0.3707181646607021,
+        "median_absolute_error": 1.4841187298787686,
+        "p90_absolute_error": 3.751704017570977,
+        "p95_absolute_error": 4.3917865406333,
+        "within_1_label_unit": 0.3383425414364641,
+        "within_2_label_units": 0.6560220994475138
+      }
+    },
+    "holdout_by_category": {
+      "Animal": {
+        "rows": 492,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.49482799841915254,
+            "mae": 2.142586076461532,
+            "rmse": 2.5153988884465317,
+            "r2": 0.11043912758615193
+          },
+          "context_catboost": {
+            "src": 0.4645128309551969,
+            "mae": 1.9907426210659047,
+            "rmse": 2.414190045472445,
+            "r2": 0.18058322137489635
+          },
+          "text_context_ridge": {
+            "src": 0.6492352494339805,
+            "mae": 1.61480831206165,
+            "rmse": 2.0892047776244667,
+            "r2": 0.38634544334366383
+          }
+        }
+      },
+      "Electronics": {
+        "rows": 111,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.3625390472768737,
+            "mae": 2.2176083000688362,
+            "rmse": 2.821364389885341,
+            "r2": 0.09371011341447866
+          },
+          "context_catboost": {
+            "src": -0.04296639487550041,
+            "mae": 2.7523613211958624,
+            "rmse": 3.2275748763909875,
+            "r2": -0.1860457046715971
+          },
+          "text_context_ridge": {
+            "src": 0.16535806527934513,
+            "mae": 2.345117031272847,
+            "rmse": 2.948282302879912,
+            "r2": 0.010337980091619126
+          }
+        }
+      },
+      "Entertainment": {
+        "rows": 878,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.22210611723663118,
+            "mae": 1.6277743488122405,
+            "rmse": 2.071675519828388,
+            "r2": 0.05543318585349888
+          },
+          "context_catboost": {
+            "src": 0.4246237102900916,
+            "mae": 1.4928332763798415,
+            "rmse": 1.9028645498901289,
+            "r2": 0.20309791047375936
+          },
+          "text_context_ridge": {
+            "src": 0.36322664087749224,
+            "mae": 1.620029087898682,
+            "rmse": 1.9948449817057405,
+            "r2": 0.12419479889999419
+          }
+        }
+      },
+      "Family": {
+        "rows": 90,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.4882502150257809,
+            "mae": 3.1492545355386197,
+            "rmse": 3.5111153228984175,
+            "r2": -0.4668610623389393
+          },
+          "context_catboost": {
+            "src": 0.45325915978540676,
+            "mae": 2.6420702725156646,
+            "rmse": 2.8137621748293014,
+            "r2": 0.0579508404278567
+          },
+          "text_context_ridge": {
+            "src": 0.5635993564056575,
+            "mae": 2.7345559302584572,
+            "rmse": 3.076842936626693,
+            "r2": -0.1264435872944052
+          }
+        }
+      },
+      "Fashion": {
+        "rows": 1448,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.6571462112369938,
+            "mae": 1.4130454629801816,
+            "rmse": 1.8721746501882892,
+            "r2": 0.4039631880522989
+          },
+          "context_catboost": {
+            "src": 0.168850495829443,
+            "mae": 1.9316380526423027,
+            "rmse": 2.4450043034099123,
+            "r2": -0.016575451126162655
+          },
+          "text_context_ridge": {
+            "src": 0.5776368322902062,
+            "mae": 1.6503759810198024,
+            "rmse": 2.039615774983998,
+            "r2": 0.2925804026600304
+          }
+        }
+      },
+      "Food": {
+        "rows": 455,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.7002384696853577,
+            "mae": 1.6705064918332242,
+            "rmse": 2.044462941438955,
+            "r2": 0.38819020188158526
+          },
+          "context_catboost": {
+            "src": 0.46702910965687255,
+            "mae": 1.8536754867977443,
+            "rmse": 2.358767755671452,
+            "r2": 0.1856177356799078
+          },
+          "text_context_ridge": {
+            "src": 0.6740657360787223,
+            "mae": 1.576635061404475,
+            "rmse": 1.9152991987354597,
+            "r2": 0.4630532769378539
+          }
+        }
+      },
+      "Holiday&Celebrations": {
+        "rows": 1656,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.2343943737748994,
+            "mae": 1.8388420015578657,
+            "rmse": 2.281130224605565,
+            "r2": -0.10219707710327497
+          },
+          "context_catboost": {
+            "src": 0.38762802983728656,
+            "mae": 1.6273527482557153,
+            "rmse": 2.062901769614142,
+            "r2": 0.09860282207338766
+          },
+          "text_context_ridge": {
+            "src": 0.45876905398919593,
+            "mae": 1.6357918164458969,
+            "rmse": 2.0694398696688423,
+            "r2": 0.09288004433487818
+          }
+        }
+      },
+      "Social&People": {
+        "rows": 538,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.28772678772995186,
+            "mae": 2.0114755005990865,
+            "rmse": 2.6118028900995984,
+            "r2": 0.04894824867556713
+          },
+          "context_catboost": {
+            "src": 0.28618948982069836,
+            "mae": 2.0940291217585663,
+            "rmse": 2.589292537191348,
+            "r2": 0.06527126741643674
+          },
+          "text_context_ridge": {
+            "src": 0.3832632484828685,
+            "mae": 1.9630057778202177,
+            "rmse": 2.466161698615695,
+            "r2": 0.15205740768444043
+          }
+        }
+      },
+      "Travel&Active&Sports": {
+        "rows": 2324,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.31926113898264413,
+            "mae": 1.929529822575769,
+            "rmse": 2.4676463109505953,
+            "r2": 0.09739855869434932
+          },
+          "context_catboost": {
+            "src": 0.3256449282262275,
+            "mae": 1.970053574044289,
+            "rmse": 2.530978581485619,
+            "r2": 0.05047339414569152
+          },
+          "text_context_ridge": {
+            "src": 0.5031294916045355,
+            "mae": 1.8536099658004221,
+            "rmse": 2.2958418390273723,
+            "r2": 0.2187066449732914
+          }
+        }
+      },
+      "Urban": {
+        "rows": 475,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.34786058938046754,
+            "mae": 2.2240112068723112,
+            "rmse": 2.8351462388062063,
+            "r2": -0.1344110166156427
+          },
+          "context_catboost": {
+            "src": 0.2561886378088881,
+            "mae": 2.187829645845779,
+            "rmse": 2.691401279100559,
+            "r2": -0.02229541819010672
+          },
+          "text_context_ridge": {
+            "src": 0.3656547882795044,
+            "mae": 2.362330078842648,
+            "rmse": 2.88254622065828,
+            "r2": -0.1726598746073138
+          }
+        }
+      },
+      "Whether&Season": {
+        "rows": 583,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.5942615005134282,
+            "mae": 1.9243868078201114,
+            "rmse": 2.369900545402197,
+            "r2": 0.25044998806129637
+          },
+          "context_catboost": {
+            "src": 0.41829797724091916,
+            "mae": 2.044799524310473,
+            "rmse": 2.5625034634244783,
+            "r2": 0.12366673869271572
+          },
+          "text_context_ridge": {
+            "src": 0.6197912410501243,
+            "mae": 1.7772211292297628,
+            "rmse": 2.266556773331224,
+            "r2": 0.3143956296496405
+          }
+        }
+      }
+    },
+    "minimum_category_rows": 50,
+    "plots": [
+      "artifacts/diagnostics/user-aware/holdout-actual-vs-predicted.png",
+      "artifacts/diagnostics/user-aware/holdout-residuals.png",
+      "artifacts/diagnostics/user-aware/holdout-mae-by-category.png"
+    ]
+  },
+  "models": {
+    "tfidf_ridge": "artifacts/models/user-aware/tfidf-ridge.joblib",
+    "context_catboost": "artifacts/models/user-aware/context-catboost.cbm",
+    "text_context_ridge": "artifacts/models/user-aware/text-context-ridge.joblib"
+  }
+}

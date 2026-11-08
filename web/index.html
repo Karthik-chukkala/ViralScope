@@ -246,6 +246,16 @@
       <p class="fine-print">SRC measures ranking agreement (higher is better). MAE is the average absolute error in label units (lower is better). Scores are from a seven-shard sample and a local time-ordered holdout, not the official test set. Feature contributions describe model behavior, not causes.</p>
     </section>
 
+    <hr id="user-aware-divider" class="divider" hidden>
+    <section id="user-aware-results" aria-labelledby="user-aware-title" hidden>
+      <div class="metrics-head">
+        <h2 id="user-aware-title">Unseen-user holdout</h2>
+        <div id="user-aware-count" class="sample-count"></div>
+      </div>
+      <div id="user-aware-metrics" class="metric-grid"></div>
+      <p class="fine-print">Users are held out as groups and are not model features. This random group split tests unseen-user generalization, not future-time generalization; compare it with the separate chronological holdout above.</p>
+    </section>
+
     <hr class="divider">
     <section aria-labelledby="diagnostics-title">
       <div class="metrics-head">
@@ -417,9 +427,19 @@
       if (!response.ok) throw new Error("Evaluation metrics are unavailable.");
       const data = await response.json();
       document.querySelector("#sample-count").textContent = `${data.evaluation.train_rows.toLocaleString()} train / ${data.evaluation.holdout_rows.toLocaleString()} holdout rows`;
-      const root = document.querySelector("#metrics");
+      renderMetricCards(document.querySelector("#metrics"), data.metrics);
+      if (data.user_aware) {
+        const evaluation = data.user_aware.evaluation;
+        document.querySelector("#user-aware-divider").hidden = false;
+        document.querySelector("#user-aware-results").hidden = false;
+        document.querySelector("#user-aware-count").textContent = `${evaluation.train_rows.toLocaleString()} train / ${evaluation.holdout_rows.toLocaleString()} unseen-user holdout posts · ${evaluation.holdout_user_count.toLocaleString()} held-out users · ${evaluation.user_overlap_count} overlap`;
+        renderMetricCards(document.querySelector("#user-aware-metrics"), data.user_aware.metrics);
+      }
+    }
+
+    function renderMetricCards(root, metrics) {
       ["tfidf_ridge", "context_catboost", "text_context_ridge"].forEach((key) => {
-        const values = data.metrics[key].holdout;
+        const values = metrics[key].holdout;
         const section = document.createElement("article");
         section.className = "metric-model";
         const heading = document.createElement("h3");

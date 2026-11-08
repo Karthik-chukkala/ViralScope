@@ -15,7 +15,7 @@ The selected model can be TF-IDF + Ridge, context CatBoost, or text + context Ri
 - `GET /`: review UI.
 - `GET /api/health`: local process health.
 - `GET /api/dataset`: full-train label summary/histogram and sample-only category/missing-title aggregates.
-- `GET /api/metrics`: train/holdout counts, aggregate metrics, residual summaries, and category slices from `artifacts/baseline-metrics.json`.
+- `GET /api/metrics`: chronological metrics/diagnostics plus aggregate user-disjoint metrics from `artifacts/baseline-metrics.json` and `artifacts/user-aware-metrics.json`, when present.
 - `GET /api/diagnostics/{filename}`: one of the allowlisted holdout diagnostic PNGs.
 - `POST /api/predict`: JSON input with `title`, `tags`, `category`, optional `subcategory` and `concept`, ISO `planned_at`, and model name.
 
@@ -29,11 +29,11 @@ From the project root, after caching a sample and training models:
 .venv/bin/python -m uvicorn viralscope.demo_app:app --host 127.0.0.1 --port 8000
 ```
 
-Open `http://127.0.0.1:8000`. The server binds to loopback by default and is not exposed to the network. The page shows the full-train target distribution, clearly labeled sampled metadata category frequencies, chronological holdout SRC/MAE comparisons, and a synthetic random-example control that fills draft fields and selects a model. Users can edit the example before requesting an estimate/explanation.
+Open `http://127.0.0.1:8000`. The server binds to loopback by default and is not exposed to the network. The page shows the full-train target distribution, clearly labeled sampled metadata category frequencies, separate chronological and unseen-user SRC/MAE comparisons, holdout diagnostic plots, and a synthetic random-example control that fills draft fields and selects a model. Users can edit the example before requesting an estimate/explanation.
 
 ## Validation
 
-The API was exercised in-process against all three saved models; each returned HTTP 200, a finite prediction, and contribution entries. Metrics returned HTTP 200 with 8,546 holdout rows. Unit tests cover UTC normalization and feature mapping. Run the full suite with:
+The API was exercised in-process against all three saved models; each returned HTTP 200, a finite prediction, and contribution entries. Metrics return both the 8,546-row chronological holdout and 9,050-row user-disjoint holdout, with zero user overlap. The browser displays the protocols separately. Unit tests cover UTC normalization, feature mapping, and that aggregate user split IDs are not returned. Run the full suite with:
 
 ```bash
 .venv/bin/python -m unittest discover -s tests -v
@@ -43,4 +43,4 @@ The API was exercised in-process against all three saved models; each returned H
 
 The page visibly displays **Powered by SMP Challenge** and the repository includes the required attribution in [Notice](../../Notice) and a copy of the Community License in [LICENSE-SMP-CHALLENGE](../../LICENSE-SMP-CHALLENGE.md). The seven-shard sample and baseline models are included in this research repository under that license. The incorporated AUP still requires review before reuse; images are not included or displayed.
 
-Predictions inherit the constraints of a seven-shard training sample and one chronological holdout that may share users across partitions. They are historical Flickr benchmark estimates and should not be interpreted as causal claims, user judgments, or platform-wide forecasts. Images remain deferred pending license review and a separate model milestone.
+Predictions inherit the constraints of a seven-shard training sample. The chronological holdout may share users across partitions; the separate group holdout is user-disjoint but not time-ordered. They are historical Flickr benchmark estimates and should not be interpreted as causal claims, user judgments, or platform-wide forecasts. Images remain deferred pending license review and a separate model milestone.

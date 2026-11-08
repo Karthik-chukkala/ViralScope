@@ -2,7 +2,7 @@
 
 ## Status
 
-The first model ladder is implemented and trained on the reproducible seven-shard local sample. The results are exploratory and sample-specific. Per-prediction linear contributions and CatBoost SHAP values are exposed in the local demo. A larger representative sample, user-aware evaluation, and explanation stability checks remain future work.
+The first model ladder is implemented and trained on the reproducible seven-shard local sample. Chronological and user-disjoint local holdouts are both evaluated. The results are exploratory and sample-specific. Per-prediction linear contributions and CatBoost SHAP values are exposed in the local demo. A larger representative sample and explanation stability checks remain future work.
 
 ## Purpose and Scope
 
@@ -23,7 +23,7 @@ The timestamp is parsed as Unix seconds. Invalid timestamps and missing, nonfini
 
 ## Evaluation Protocol
 
-Rows are ordered by `Postdate`; the final 20% by time is a local holdout and all earlier rows are training data. Equal timestamps at the cutoff go to the holdout. This is a future-time evaluation, not user-independent evaluation: user IDs were intentionally omitted from the cache, so user overlap cannot be measured. The sample itself is seven evenly spaced physical shards, not a random row sample; both limitations constrain generalization claims.
+Rows are ordered by `Postdate`; the final 20% by time is a local holdout and all earlier rows are training data. Equal timestamps at the cutoff go to the holdout. This future-time evaluation may share users across partitions. A separate user-disjoint group holdout is reported below. The sample itself is seven evenly spaced physical shards, not a random row sample; these limitations constrain generalization claims.
 
 Report **SRC** (Spearman rank correlation) and **MAE** (challenge-aligned metrics), plus **RMSE** and **R²**. Training metrics diagnose fit; holdout metrics are the main result. The public HF test labels are withheld placeholders and are not scored.
 
@@ -54,6 +54,22 @@ Positive mean error denotes average overprediction. Category metrics include gro
 
 The saved charts are `holdout-actual-vs-predicted.png`, `holdout-residuals.png`, and `holdout-mae-by-category.png`. The local UI renders all three through the allowlisted `/api/diagnostics/{filename}` route.
 
+## User-Disjoint Evaluation
+
+`viralscope.user_aware_eval` fetches only `Uid` from the exact seven shards listed in the sample manifest. It verifies the pinned revision and row alignment, uses IDs only as `GroupShuffleSplit` groups, and keeps ID values in memory. IDs are neither model features nor written to the cache, report, or repository. The fixed random seed is 42.
+
+The user-disjoint result uses 33,680 train posts from 8,780 users and 9,050 holdout posts from 2,196 unseen users; measured user overlap is zero.
+
+| Model | Chronological SRC | Chronological MAE | Unseen-user SRC | Unseen-user MAE |
+| --- | ---: | ---: | ---: | ---: |
+| TF-IDF + Ridge | 0.575 | 1.623 | 0.443 | 1.835 |
+| Context CatBoost | 0.317 | 1.898 | 0.428 | 1.890 |
+| Text + context Ridge | 0.578 | 1.642 | 0.548 | 1.775 |
+
+The group holdout is randomly assigned by user and is not time-ordered. It complements, rather than replaces, the chronological evaluation. Text + context leads on the user-disjoint holdout; its performance is lower than on the chronological holdout, which is consistent with a harder unseen-user setting but does not isolate user effects from the different holdout composition. A future-time, unseen-user evaluation would require a combined split protocol.
+
+The aggregate report is `artifacts/user-aware-metrics.json`; model files and plots are kept in `artifacts/models/user-aware/` and `artifacts/diagnostics/user-aware/`. The report contains user counts and overlap only, never raw IDs.
+
 The complete report is `artifacts/baseline-metrics.json`. Models are stored under `artifacts/models/` and included with the research repository under the SMP Challenge Community License. Scores are not official test results and do not establish expected performance on the entire training split.
 
 ## Run and Reproduce
@@ -63,6 +79,7 @@ Create the cache and train the baselines:
 ```bash
 HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.sample_cache --sample-shards 7 --workers 4
 .venv/bin/python -u -m viralscope.train_baselines --workers 4
+HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.user_aware_eval --workers 4
 ```
 
 The cache and trained models are local artifacts; the commands do not download image bytes. Run tests with:
@@ -74,8 +91,8 @@ The cache and trained models are local artifacts; the commands do not download i
 ## Limitations and Next Checks
 
 - Increase sample coverage only after the current pipeline is reproducible; do not jump to the full image-bearing Parquet download for these feature groups.
-- Evaluate a user-aware split using a separate, local split-only ID column if the intended claim requires generalization to unseen users; never pass that ID to the model.
 - Add validation-only tuning and compare stability across multiple temporal cutoffs before selecting a final model.
+- Design a combined future-time/unseen-user protocol if that is the intended deployment claim.
 - Validate contribution explanations across representative examples and inspect them for text artifacts before any broader release.
 - Compare the generated residual and category plots at additional temporal cutoffs before selecting a model.
 - Keep image training deferred until the supervisor reviews the license conditions for image use and display.

@@ -21,6 +21,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.pipeline import Pipeline
+from sklearn.model_selection import GroupShuffleSplit
 from sklearn.preprocessing import OneHotEncoder
 
 DEFAULT_DATA = Path("data/train-sample.parquet")
@@ -88,6 +89,34 @@ def chronological_split(
     if not train_mask.any() or not holdout_mask.any():
         raise ValueError("timestamps do not support a non-empty chronological holdout")
     return np.flatnonzero(train_mask), np.flatnonzero(holdout_mask), cutoff
+
+
+def user_aware_split(
+    features: pd.DataFrame,
+    labels: np.ndarray,
+    groups: np.ndarray,
+    holdout_fraction: float = 0.2,
+    random_seed: int = 42,
+) -> tuple[np.ndarray, np.ndarray]:
+    if not 0 < holdout_fraction < 1:
+        raise ValueError("holdout_fraction must be between zero and one")
+    group_values = np.asarray(groups)
+    if group_values.ndim != 1 or len(group_values) != len(labels):
+        raise ValueError("one group ID is required for each valid row")
+    if pd.isna(group_values).any():
+        raise ValueError("group IDs must not be missing")
+    if np.unique(group_values).size < 2:
+        raise ValueError("at least two distinct groups are required")
+
+    splitter = GroupShuffleSplit(
+        n_splits=1,
+        test_size=holdout_fraction,
+        random_state=random_seed,
+    )
+    train_indexes, holdout_indexes = next(
+        splitter.split(features, labels, groups=group_values)
+    )
+    return train_indexes, holdout_indexes
 
 
 def _metrics(actual: np.ndarray, predicted: np.ndarray) -> dict[str, float | None]:
@@ -221,14 +250,35 @@ def train_baselines(
     report_path: Path = DEFAULT_REPORT,
     model_dir: Path = DEFAULT_MODEL_DIR,
     workers: int = 4,
+    split_strategy: str = "chronological",
+    groups: np.ndarray | None = None,
+    diagnostic_dir: Path = DEFAULT_DIAGNOSTIC_DIR,
 ) -> dict[str, Any]:
     if workers < 1:
         raise ValueError("workers must be positive")
     frame = pd.read_parquet(data_path)
     features, labels, timestamps = build_features(frame)
-    train_indexes, holdout_indexes, cutoff = chronological_split(
-        features, labels, timestamps
-    )
+    valid_groups = None
+    cutoff: int | None
+    if split_strategy == "chronological":
+        train_indexes, holdout_indexes, cutoff = chronological_split(
+            features, labels, timestamps
+        )
+        protocol = "chronological local holdout from sampled training shards"
+    elif split_strategy == "user":
+        if groups is None:
+            raise ValueError("user groups are required for user-aware evaluation")
+        source_groups = np.asarray(groups)
+        if source_groups.ndim != 1 or len(source_groups) != len(frame):
+            raise ValueError("one group ID is required for each cached sample row")
+        valid_groups = source_groups[features.index.to_numpy()]
+        train_indexes, holdout_indexes = user_aware_split(
+            features, labels, valid_groups
+        )
+        cutoff = None
+        protocol = "user-disjoint local holdout from sampled training shards"
+    else:
+        raise ValueError("split_strategy must be 'chronological' or 'user'")
     train = features.iloc[train_indexes]
     holdout = features.iloc[holdout_indexes]
     train_labels = labels[train_indexes]
@@ -356,23 +406,44 @@ def train_baselines(
         holdout_predictions,
     )
     diagnostic_plots = _save_diagnostic_plots(
-        DEFAULT_DIAGNOSTIC_DIR,
+        diagnostic_dir,
         holdout_labels,
         holdout_predictions,
         category_metrics,
     )
+    evaluation: dict[str, Any] = {
+        "protocol": protocol,
+        "holdout_fraction_requested": 0.2,
+        "holdout_fraction_unit": "post_rows",
+        "split_unit": "post_row",
+        "cutoff_utc": (
+            pd.to_datetime(cutoff, unit="s", utc=True).isoformat()
+            if cutoff is not None
+            else None
+        ),
+        "valid_rows": len(labels),
+        "train_rows": len(train_indexes),
+        "holdout_rows": len(holdout_indexes),
+        "official_test_scored": False,
+    }
+    if valid_groups is not None:
+        train_users = set(valid_groups[train_indexes])
+        holdout_users = set(valid_groups[holdout_indexes])
+        evaluation.update(
+            {
+                "train_user_count": len(train_users),
+                "holdout_user_count": len(holdout_users),
+                "user_overlap_count": len(train_users & holdout_users),
+                "holdout_fraction_unit": "users",
+                "split_unit": "user_group",
+                "random_seed": 42,
+            }
+        )
+
     report = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "dataset": manifest,
-        "evaluation": {
-            "protocol": "chronological local holdout from sampled training shards",
-            "holdout_fraction_requested": 0.2,
-            "cutoff_utc": pd.to_datetime(cutoff, unit="s", utc=True).isoformat(),
-            "valid_rows": len(labels),
-            "train_rows": len(train_indexes),
-            "holdout_rows": len(holdout_indexes),
-            "official_test_scored": False,
-        },
+        "evaluation": evaluation,
         "metrics": results,
         "diagnostics": {
             "residuals": {
@@ -384,9 +455,9 @@ def train_baselines(
             "plots": diagnostic_plots,
         },
         "models": {
-            "tfidf_ridge": "artifacts/models/tfidf-ridge.joblib",
-            "context_catboost": "artifacts/models/context-catboost.cbm",
-            "text_context_ridge": "artifacts/models/text-context-ridge.joblib",
+            "tfidf_ridge": str(model_dir / "tfidf-ridge.joblib"),
+            "context_catboost": str(model_dir / "context-catboost.cbm"),
+            "text_context_ridge": str(model_dir / "text-context-ridge.joblib"),
         },
     }
     report_path.parent.mkdir(parents=True, exist_ok=True)

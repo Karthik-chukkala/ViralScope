@@ -4,7 +4,7 @@ ViralScope is a research prototype for estimating the historical SMP Challenge p
 
 ## Current Demo
 
-The local FastAPI demo serves a dataset snapshot, sampled category analysis, chronological holdout metrics, residual/category diagnostic plots, and an interactive prediction form with feature contributions and random synthetic examples. Start it after generating the local data/model artifacts:
+The local FastAPI demo serves a dataset snapshot, sampled category analysis, chronological and user-disjoint holdout metrics, residual/category diagnostic plots, and an interactive prediction form with feature contributions and random synthetic examples. Start it after generating the local data/model artifacts:
 
 ```bash
 .venv/bin/python -m uvicorn viralscope.demo_app:app --host 127.0.0.1 --port 8000
@@ -20,6 +20,7 @@ Use the project environment and a local Hugging Face login for gated dataset acc
 HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.metadata_eda
 HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.sample_cache --sample-shards 7 --workers 4
 .venv/bin/python -u -m viralscope.train_baselines --workers 4
+HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.user_aware_eval --workers 4
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python -m uvicorn viralscope.demo_app:app --host 127.0.0.1 --port 8000
 ```
@@ -37,7 +38,7 @@ The full image-bearing dataset, image assets, and copied research papers/text ex
 - [Model baselines](docs/modules/modeling-baselines.md)
 - [Local demo](docs/modules/local-demo.md)
 
-The selected dataset revision is `f131dba653a05c0e3c6294388f81ed3fbd9c71a0`. The public test split is treated as unlabeled because sampled labels were `-1`; do not score it. Baseline metrics are from a seven-shard sample and chronological local holdout, not official test results.
+The selected dataset revision is `f131dba653a05c0e3c6294388f81ed3fbd9c71a0`. The public test split is treated as unlabeled because sampled labels were `-1`; do not score it. Baseline metrics are from seven sampled shards and local chronological/user-disjoint holdouts, not official test results.
 
 ## License
 

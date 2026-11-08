@@ -22,6 +22,7 @@ from .train_baselines import CATEGORICAL_FEATURES, TIME_FEATURES
 ROOT = Path(__file__).resolve().parents[1]
 MODEL_DIR = ROOT / "artifacts/models"
 METRICS_PATH = ROOT / "artifacts/baseline-metrics.json"
+USER_AWARE_METRICS_PATH = ROOT / "artifacts/user-aware-metrics.json"
 TARGET_AUDIT_PATH = ROOT / "artifacts/train-target-audit.json"
 METADATA_EDA_PATH = ROOT / "artifacts/metadata-eda.json"
 DIAGNOSTIC_DIR = ROOT / "artifacts/diagnostics"
@@ -129,11 +130,18 @@ def metrics() -> dict[str, Any]:
     if not METRICS_PATH.exists():
         raise HTTPException(status_code=503, detail="Baseline metrics are not available.")
     report = json_read_metrics()
-    return {
+    response = {
         "evaluation": report["evaluation"],
         "metrics": report["metrics"],
         "diagnostics": report.get("diagnostics", {}),
     }
+    if USER_AWARE_METRICS_PATH.exists():
+        user_report = json.loads(USER_AWARE_METRICS_PATH.read_text(encoding="utf-8"))
+        response["user_aware"] = {
+            "evaluation": user_report["evaluation"],
+            "metrics": user_report["metrics"],
+        }
+    return response
 
 
 @app.get("/api/diagnostics/{filename}")

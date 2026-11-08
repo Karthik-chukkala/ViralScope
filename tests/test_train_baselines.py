@@ -7,10 +7,32 @@ from viralscope.train_baselines import (
     _holdout_category_metrics,
     chronological_split,
     summarize_residuals,
+    user_aware_split,
 )
 
 
 class TrainBaselineTests(unittest.TestCase):
+    def test_user_aware_split_is_deterministic_and_has_no_group_overlap(self) -> None:
+        features = pd.DataFrame({"value": range(30)})
+        labels = np.arange(30, dtype=np.float64)
+        groups = np.repeat(np.arange(10), 3)
+
+        train_indexes, holdout_indexes = user_aware_split(features, labels, groups)
+        repeated_train, repeated_holdout = user_aware_split(features, labels, groups)
+
+        self.assertTrue(np.array_equal(train_indexes, repeated_train))
+        self.assertTrue(np.array_equal(holdout_indexes, repeated_holdout))
+        self.assertFalse(set(groups[train_indexes]) & set(groups[holdout_indexes]))
+
+    def test_user_aware_split_rejects_misaligned_or_missing_groups(self) -> None:
+        features = pd.DataFrame({"value": range(3)})
+        labels = np.arange(3, dtype=np.float64)
+
+        with self.assertRaises(ValueError):
+            user_aware_split(features, labels, np.array(["a", "b"]))
+        with self.assertRaises(ValueError):
+            user_aware_split(features, labels, np.array(["a", None, "b"], dtype=object))
+
     def test_summarize_residuals_reports_signed_bias_and_absolute_error_bands(self) -> None:
         summary = summarize_residuals(
             np.array([1.0, 2.0, 3.0]),

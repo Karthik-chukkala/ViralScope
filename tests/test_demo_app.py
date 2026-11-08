@@ -1,10 +1,22 @@
+import json
 import unittest
 from datetime import datetime
 
-from viralscope.demo_app import PredictionRequest, make_prediction_features
+from fastapi.testclient import TestClient
+
+from viralscope.demo_app import PredictionRequest, app, make_prediction_features
 
 
 class DemoAppTests(unittest.TestCase):
+    def test_metrics_api_exposes_aggregate_user_split_without_ids(self) -> None:
+        response = TestClient(app).get("/api/metrics")
+
+        self.assertEqual(response.status_code, 200)
+        user_aware = response.json()["user_aware"]
+        self.assertEqual(user_aware["evaluation"]["user_overlap_count"], 0)
+        self.assertEqual(user_aware["evaluation"]["holdout_user_count"], 2196)
+        self.assertNotIn('"Uid"', json.dumps(user_aware))
+
     def test_feature_builder_uses_utc_and_combines_text_fields(self) -> None:
         request = PredictionRequest(
             title="Coastal walk",
