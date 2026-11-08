@@ -26,11 +26,13 @@ USER_AWARE_METRICS_PATH = ROOT / "artifacts/user-aware-metrics.json"
 TEMPORAL_METRICS_PATH = ROOT / "artifacts/temporal-sensitivity.json"
 TARGET_AUDIT_PATH = ROOT / "artifacts/train-target-audit.json"
 METADATA_EDA_PATH = ROOT / "artifacts/metadata-eda.json"
+SAMPLE_EDA_PATH = ROOT / "artifacts/sample-eda.json"
 DIAGNOSTIC_DIR = ROOT / "artifacts/diagnostics"
 DIAGNOSTIC_FILES = {
     "holdout-actual-vs-predicted.png",
     "holdout-residuals.png",
     "holdout-mae-by-category.png",
+    "sample-temporal-text.png",
 }
 WEB_PAGE = ROOT / "web/index.html"
 MODEL_CHOICES = ("tfidf_ridge", "context_catboost", "text_context_ridge")
@@ -168,6 +170,10 @@ def dataset_summary() -> dict[str, Any]:
         raise HTTPException(status_code=503, detail="Dataset audit reports are not available.")
     target_report = json.loads(TARGET_AUDIT_PATH.read_text(encoding="utf-8"))
     metadata_report = json.loads(METADATA_EDA_PATH.read_text(encoding="utf-8"))
+    sample_eda = None
+    if SAMPLE_EDA_PATH.exists():
+        sample_eda_report = json.loads(SAMPLE_EDA_PATH.read_text(encoding="utf-8"))
+        sample_eda = sample_eda_report["sample_eda"]
     target_summary = target_report["target"]["non_sentinel_summary"]
     target_summary["histogram_counts"] = target_report["target"]["non_sentinel_histogram"]["counts"]
     target_summary["histogram_edges"] = target_report["target"]["non_sentinel_histogram"]["bin_edges"]
@@ -182,6 +188,7 @@ def dataset_summary() -> dict[str, Any]:
             "missing_titles": metadata_report["eda"]["missing_counts"]["Title"],
             "categories": metadata_report["eda"]["category_frequencies"],
         },
+        "sample_text_temporal_eda": sample_eda,
     }
 
 

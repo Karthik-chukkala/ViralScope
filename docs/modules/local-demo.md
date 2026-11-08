@@ -14,10 +14,10 @@ The selected model can be TF-IDF + Ridge, context CatBoost, or text + context Ri
 
 - `GET /`: review UI.
 - `GET /api/health`: local process health.
-- `GET /api/dataset`: full-train label summary/histogram and sample-only category/missing-title aggregates.
+- `GET /api/dataset`: full-train label summary/histogram plus sample-only category, missing-title, text-length, and temporal aggregates.
 - `GET /api/metrics`: chronological metrics/diagnostics plus aggregate user-disjoint metrics from `artifacts/baseline-metrics.json` and `artifacts/user-aware-metrics.json`, when present.
 - The same metrics response includes the 15/20/25% temporal-sensitivity summary from `artifacts/temporal-sensitivity.json`, when present.
-- `GET /api/diagnostics/{filename}`: one of the allowlisted holdout diagnostic PNGs.
+- `GET /api/diagnostics/{filename}`: one of the allowlisted sample EDA or holdout diagnostic PNGs.
 - `POST /api/predict`: JSON input with `title`, `tags`, `category`, optional `subcategory` and `concept`, ISO `planned_at`, and model name.
 
 The service expects trained files under `artifacts/models/`; it returns HTTP 503 with a clear message if they are missing. Pydantic bounds text lengths and model names. Naive input datetimes are interpreted as UTC; the UI labels the planned time as UTC and submits an explicit UTC offset.
@@ -30,7 +30,7 @@ From the project root, after caching a sample and training models:
 .venv/bin/python -m uvicorn viralscope.demo_app:app --host 127.0.0.1 --port 8000
 ```
 
-Open `http://127.0.0.1:8000`. The server binds to loopback by default and is not exposed to the network. The page shows the full-train target distribution, clearly labeled sampled metadata category frequencies, chronological, unseen-user, and temporal-sensitivity model comparisons, holdout diagnostic plots, and a synthetic random-example control that fills draft fields and selects a model. Users can edit the example before requesting an estimate/explanation.
+Open `http://127.0.0.1:8000`. The server binds to loopback by default and is not exposed to the network. The page shows the full-train target distribution, clearly labeled sampled category/text/time analysis, chronological, unseen-user, and temporal-sensitivity model comparisons, holdout diagnostic plots, and a synthetic random-example control that fills draft fields and selects a model. Users can edit the example before requesting an estimate/explanation.
 
 ## Validation
 

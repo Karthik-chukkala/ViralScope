@@ -8,6 +8,15 @@ from viralscope.demo_app import PredictionRequest, app, make_prediction_features
 
 
 class DemoAppTests(unittest.TestCase):
+    def test_dataset_api_exposes_aggregate_sample_eda_only(self) -> None:
+        response = TestClient(app).get("/api/dataset")
+
+        self.assertEqual(response.status_code, 200)
+        sample_eda = response.json()["sample_text_temporal_eda"]
+        self.assertEqual(sample_eda["rows"], 42730)
+        self.assertEqual(sample_eda["title_character_lengths"]["median"], 19.0)
+        self.assertFalse(sample_eda["privacy"]["raw_text_written"])
+
     def test_metrics_api_exposes_aggregate_user_split_without_ids(self) -> None:
         response = TestClient(app).get("/api/metrics")
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-**Full pinned-train target-label scan: complete.** A reproducible metadata EDA path and local training cache now use seven evenly spaced shards with up to four workers. Findings are explicitly sample-only, not row-random or full-split results. Broad charts and image-quality analysis remain deferred; initial text/context model results are documented in [Modeling Baselines](modeling-baselines.md).
+**Full pinned-train target-label scan: complete.** A reproducible metadata EDA path and local training cache now use seven evenly spaced shards with up to four workers. Initial month, category, title-length, and tag-length charts are saved for that sample only, not as full-split findings. Broader full-train EDA and image-quality analysis remain deferred; model results are documented in [Modeling Baselines](modeling-baselines.md).
 
 ## Purpose
 
@@ -37,6 +37,18 @@ To adjust sampling/concurrency, use `--sample-shards 7 --workers 4`. To restore 
 The pinned sample contains 42,730 rows from seven evenly spaced shards. It has 10,976 distinct users, no duplicate post IDs in this sample, no missing timestamps/categories/tags, and 1,474 missing titles (3.45%). The most frequent categories are Travel&Active&Sports (9,047), Holiday&Celebrations (7,614), and Fashion (6,381). These figures describe the selected shards only; do not extrapolate them as exact full-train rates. The aggregate output is `artifacts/metadata-eda.json`.
 
 The separate training sample is `data/train-sample.parquet`, with its source revision and shard list in `data/train-sample-manifest.json`. It includes `label`, `Postdate`, `Category`, `Subcategory`, `Concept`, `Title`, and `Alltags`; it excludes IDs, profile/location fields, and image paths. The sample is included in this research repository under the SMP Challenge Community License and contains raw title/tag text. Do not redistribute it outside the license terms or use it for commercial/foundation-model development.
+
+### Text and temporal profile
+
+`viralscope.sample_eda` summarizes the existing local sample without another dataset read. The seven-shard slice covers `2015-02-28` through `2016-02-29` UTC, has 1,474 missing titles (3.45%), and no missing timestamps/categories/tags or invalid timestamps. Nonempty titles have median length 19 characters / 3 whitespace-delimited words; tag fields have a median of 15 whitespace-delimited tokens. The sample label mean is 6.4219 and median is 6.27, close to but not equal to full train; use the complete label-only audit for full-train label statistics.
+
+Monthly counts, title-length, and tag-token histograms are saved in `artifacts/diagnostics/sample-temporal-text.png`; aggregate counts and quantiles are in `artifacts/sample-eda.json`. The report contains no raw text or IDs. Every temporal/text frequency in this artifact remains sample-only and reflects the selected shard mix.
+
+Run the local EDA without network access after the sample cache exists:
+
+```bash
+.venv/bin/python -u -m viralscope.sample_eda
+```
 
 ## Implemented Slice: Target Labels
 

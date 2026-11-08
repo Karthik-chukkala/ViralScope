@@ -41,13 +41,13 @@ The published training sample includes raw title/tag text but excludes IDs, prof
 ## 3. What Is Implemented
 
 1. **Dataset access and audit:** pinned revision, license/provenance report, split sizes, and the complete label-only scan. Code: `viralscope/dataset_audit.py`, `viralscope/target_audit.py`.
-2. **Sample metadata EDA:** aggregate missingness, ID uniqueness, categories, concepts, monthly counts, and title/tag lengths. Code: `viralscope/metadata_eda.py`; output: `artifacts/metadata-eda.json`.
+2. **Sample metadata EDA:** aggregate missingness, ID uniqueness, categories, concepts, monthly counts, and title/tag lengths. Code: `viralscope/metadata_eda.py`; output: `artifacts/metadata-eda.json`. The local cache also drives text/time distribution checks and a plot via `viralscope/sample_eda.py`, saved to `artifacts/sample-eda.json` and `artifacts/diagnostics/sample-temporal-text.png`.
 3. **Local modeling cache:** selected non-image columns plus `label`, saved to `data/train-sample.parquet`; provenance is in `data/train-sample-manifest.json`. Code: `viralscope/sample_cache.py`.
 4. **Baseline ladder:** median, TF-IDF + Ridge, context CatBoost, and text + context Ridge. Chronological and user-disjoint holdouts are both evaluated. Code: `viralscope/train_baselines.py`, `viralscope/user_aware_eval.py`; reports: `artifacts/baseline-metrics.json`, `artifacts/user-aware-metrics.json`; model files: `artifacts/models/`.
 5. **Inference and review site:** FastAPI serves the UI, aggregate dataset snapshot/histogram, category sample chart, both holdout metric sets, residual/category diagnostics, and prediction endpoint. The form prefills a synthetic example and can shuffle to another draft/model without typing. Text models explain signed feature contributions; CatBoost uses SHAP values. Code: `viralscope/demo_app.py`, `web/index.html`.
 6. **Module documentation:** [Dataset Access and Audit](modules/dataset-access-and-audit.md), [Cleaning and EDA](modules/cleaning-and-eda.md), [Modeling Baselines](modules/modeling-baselines.md), and [Local Demo](modules/local-demo.md).
 
-The local site is currently running on loopback at port 8000. It was checked in a browser at desktop and mobile widths; form submission, dataset visualizations, holdout diagnostic plots, and explanations work without horizontal overflow.
+The local site is currently running on loopback at port 8000. It was checked in a browser at desktop and mobile widths; form submission, dataset/text/time visualizations, both evaluation panels, holdout diagnostic plots, and explanations work without horizontal overflow.
 
 ## 4. Model Results
 
@@ -90,14 +90,14 @@ HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.metadata_eda
 # Build/rebuild the local, image-free modeling cache
 HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.sample_cache --sample-shards 7 --workers 4
 
+# Create aggregate text/time EDA and charts from the local cache
+.venv/bin/python -u -m viralscope.sample_eda
+
 # Train models and refresh metrics
 .venv/bin/python -u -m viralscope.train_baselines --workers 4
 
 # Evaluate a disjoint user holdout; user IDs are read in memory and never saved
 HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.user_aware_eval --workers 4
-
-# Check temporal ranking stability without persisting extra model artifacts
-.venv/bin/python -u -m viralscope.temporal_sensitivity --workers 4
 
 # Check temporal ranking stability without persisting extra model artifacts
 .venv/bin/python -u -m viralscope.temporal_sensitivity --workers 4
@@ -113,7 +113,7 @@ Hugging Face commands require the local credential. `HF_HUB_DOWNLOAD_TIMEOUT=120
 
 The API routes are `GET /api/health`, `GET /api/dataset`, `GET /api/metrics`, `GET /api/diagnostics/{filename}`, and `POST /api/predict`. Prediction input is title, tags, category, optional subcategory/concept, planned UTC datetime, and model name (`tfidf_ridge`, `context_catboost`, or `text_context_ridge`).
 
-Latest test result: **19 tests passed**. API smoke checks returned HTTP 200 for health, dataset summary, chronological/user-aware/temporal metrics, diagnostic plots, and predictions/explanations from all three saved models.
+Latest test result: **21 tests passed**. API smoke checks returned HTTP 200 for health, dataset summary, chronological/user-aware/temporal metrics, sample EDA and holdout diagnostic plots, and predictions/explanations from all three saved models.
 
 ## 6. What Remains
 

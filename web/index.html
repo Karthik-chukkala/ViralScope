@@ -93,6 +93,9 @@
     .category-name { overflow-wrap: anywhere; color: var(--muted); }
     .category-track { height: 6px; background: #dbe8e3; }
     .category-fill { height: 100%; background: var(--coral); }
+    .sample-eda-figure { margin: 24px 0 0; }
+    .sample-eda-figure img { display: block; width: 100%; height: auto; border: 1px solid var(--line); background: white; }
+    .sample-eda-figure figcaption { margin-top: 8px; color: var(--muted); font-size: 11px; line-height: 1.45; }
     .metrics-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
     .sample-count { color: var(--muted); font-size: 11px; text-align: right; }
     .metric-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
@@ -238,6 +241,10 @@
           <div id="category-bars" class="category-bars"></div>
         </div>
       </div>
+      <figure class="sample-eda-figure">
+        <img src="/api/diagnostics/sample-temporal-text.png" alt="Sample-only charts of posts per month and distributions of title character length and tag token count.">
+        <figcaption id="sample-eda-caption">Sample-only temporal and text coverage; these distributions are not full-train estimates.</figcaption>
+      </figure>
       <p class="fine-print">Target summary is a complete label-only scan. Metadata frequencies use seven evenly spaced shards (not a random sample); do not treat them as exact full-train proportions. No image bytes, raw text, or IDs are shown.</p>
     </section>
 
@@ -404,6 +411,14 @@
       document.querySelector("#sample-title-missing").textContent = `${missingRate.toFixed(1)}% missing titles in sample`;
       document.querySelector("#dataset-revision").textContent = `Revision ${data.revision.slice(0, 12)}`;
       document.querySelector("#category-heading").textContent = `Category frequency · ${data.metadata_sample.shards_scanned} of ${data.metadata_sample.shards_available} shards`;
+      if (data.sample_text_temporal_eda) {
+        const eda = data.sample_text_temporal_eda;
+        document.querySelector("#sample-eda-caption").textContent =
+          `Seven-shard sample only: ${eda.rows.toLocaleString()} posts, ` +
+          `median title ${eda.title_character_lengths.median} characters ` +
+          `(${eda.title_word_counts.median} words), median ${eda.tag_token_counts.median} tag tokens, ` +
+          `${eda.missing_or_blank.Title.toLocaleString()} missing titles. Not full-train estimates.`;
+      }
 
       const histogram = document.querySelector("#target-histogram");
       const maxCount = Math.max(...data.target.histogram_counts);

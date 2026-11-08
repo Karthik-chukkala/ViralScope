@@ -1,0 +1,148 @@
+{
+  "generated_at_utc": "2026-11-08T04:25:59.681208+00:00",
+  "dataset": {
+    "repository": "smpchallenge/SMP-Image",
+    "revision": "f131dba653a05c0e3c6294388f81ed3fbd9c71a0",
+    "split": "train",
+    "sample_method": "evenly_spaced_shards",
+    "shards_selected": [
+      "data/train-00000.parquet",
+      "data/train-00008.parquet",
+      "data/train-00016.parquet",
+      "data/train-00024.parquet",
+      "data/train-00032.parquet",
+      "data/train-00040.parquet",
+      "data/train-00048.parquet"
+    ]
+  },
+  "sample_eda": {
+    "rows": 42730,
+    "missing_or_blank": {
+      "Postdate": 0,
+      "Category": 0,
+      "Title": 1474,
+      "Alltags": 0,
+      "label": 0
+    },
+    "invalid_timestamp_count": 0,
+    "postdate_range_utc": {
+      "min": "2015-02-28T16:00:00+00:00",
+      "max": "2016-02-29T15:54:26+00:00"
+    },
+    "monthly_posts_utc": [
+      {
+        "month": "2015-02",
+        "count": 16
+      },
+      {
+        "month": "2015-03",
+        "count": 5228
+      },
+      {
+        "month": "2015-04",
+        "count": 1616
+      },
+      {
+        "month": "2015-05",
+        "count": 1749
+      },
+      {
+        "month": "2015-06",
+        "count": 1126
+      },
+      {
+        "month": "2015-07",
+        "count": 1470
+      },
+      {
+        "month": "2015-08",
+        "count": 4598
+      },
+      {
+        "month": "2015-09",
+        "count": 3187
+      },
+      {
+        "month": "2015-10",
+        "count": 4155
+      },
+      {
+        "month": "2015-11",
+        "count": 5111
+      },
+      {
+        "month": "2015-12",
+        "count": 4451
+      },
+      {
+        "month": "2016-01",
+        "count": 4261
+      },
+      {
+        "month": "2016-02",
+        "count": 5762
+      }
+    ],
+    "category_count": 11,
+    "top_5_categories": [
+      {
+        "category": "Travel&Active&Sports",
+        "count": 9047
+      },
+      {
+        "category": "Holiday&Celebrations",
+        "count": 7614
+      },
+      {
+        "category": "Fashion",
+        "count": 6381
+      },
+      {
+        "category": "Entertainment",
+        "count": 4510
+      },
+      {
+        "category": "Social&People",
+        "count": 3292
+      }
+    ],
+    "title_character_lengths": {
+      "count": 41256,
+      "min": 1,
+      "median": 19.0,
+      "mean": 29.60207000193911,
+      "p90": 56.0,
+      "max": 263
+    },
+    "title_word_counts": {
+      "count": 41256,
+      "min": 1,
+      "median": 3.0,
+      "mean": 4.351924568547605,
+      "p90": 9.0,
+      "max": 55
+    },
+    "tag_token_counts": {
+      "count": 42730,
+      "min": 1,
+      "median": 15.0,
+      "mean": 20.80762930025743,
+      "p90": 49.0,
+      "max": 75
+    },
+    "label_summary": {
+      "count": 42730,
+      "min": 1.0,
+      "median": 6.269999980926514,
+      "mean": 6.421920197171293,
+      "max": 16.450000762939453
+    },
+    "privacy": {
+      "raw_text_written": false,
+      "user_ids_read": false,
+      "post_ids_read": false,
+      "image_bytes_read": false
+    }
+  },
+  "plot": "artifacts/diagnostics/sample-temporal-text.png"
+}

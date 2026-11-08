@@ -4,7 +4,7 @@ ViralScope is a research prototype for estimating the historical SMP Challenge p
 
 ## Current Demo
 
-The local FastAPI demo serves a dataset snapshot, sampled category analysis, chronological and user-disjoint holdout metrics, temporal cutoff sensitivity, residual/category diagnostic plots, and an interactive prediction form with feature contributions and random synthetic examples. Start it after generating the local data/model artifacts:
+The local FastAPI demo serves a dataset snapshot, sampled category/text/time analysis, chronological and user-disjoint holdout metrics, temporal cutoff sensitivity, residual/category diagnostic plots, and an interactive prediction form with feature contributions and random synthetic examples. Start it after generating the local data/model artifacts:
 
 ```bash
 .venv/bin/python -m uvicorn viralscope.demo_app:app --host 127.0.0.1 --port 8000
@@ -19,6 +19,7 @@ Use the project environment and a local Hugging Face login for gated dataset acc
 ```bash
 HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.metadata_eda
 HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.sample_cache --sample-shards 7 --workers 4
+.venv/bin/python -u -m viralscope.sample_eda
 .venv/bin/python -u -m viralscope.train_baselines --workers 4
 HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.user_aware_eval --workers 4
 .venv/bin/python -u -m viralscope.temporal_sensitivity --workers 4
