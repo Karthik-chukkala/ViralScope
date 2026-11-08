@@ -40,6 +40,20 @@ The run used 42,730 valid rows: 34,184 train and 8,546 chronological holdout, wi
 
 The combined model improves holdout SRC slightly over text alone, but has slightly worse MAE, RMSE, and R². There is no evidence here that adding context improves overall score estimation. Large train-to-holdout gaps indicate overfitting, especially for sparse text features; no parameter tuning was performed on the holdout.
 
+### Holdout error diagnostics
+
+The training run saves actual-versus-predicted, residual histogram, and per-category MAE charts under `artifacts/diagnostics/`, and adds residual summaries/category metrics to `artifacts/baseline-metrics.json`.
+
+| Model | Mean error (predicted - actual) | Median absolute error | 90th-percentile absolute error | Within 2 label units |
+| --- | ---: | ---: | ---: | ---: |
+| TF-IDF + Ridge | +0.543 | 1.373 | 3.432 | 68.4% |
+| Context CatBoost | +0.131 | 1.640 | 3.910 | 59.1% |
+| Text + context Ridge | +0.537 | 1.406 | 3.358 | 67.2% |
+
+Positive mean error denotes average overprediction. Category metrics include groups with at least 50 holdout rows. In this sample, text + context has the lowest category MAE for Food (1.268 on 662 posts); all three models have their highest category MAE in Family (2.067 / 2.034 / 2.090 on 68 posts). Small category slices are less stable, and none of these sample patterns should be treated as full-dataset or causal findings.
+
+The saved charts are `holdout-actual-vs-predicted.png`, `holdout-residuals.png`, and `holdout-mae-by-category.png`. The local UI renders all three through the allowlisted `/api/diagnostics/{filename}` route.
+
 The complete report is `artifacts/baseline-metrics.json`. Models are stored under `artifacts/models/` and included with the research repository under the SMP Challenge Community License. Scores are not official test results and do not establish expected performance on the entire training split.
 
 ## Run and Reproduce
@@ -63,4 +77,5 @@ The cache and trained models are local artifacts; the commands do not download i
 - Evaluate a user-aware split using a separate, local split-only ID column if the intended claim requires generalization to unseen users; never pass that ID to the model.
 - Add validation-only tuning and compare stability across multiple temporal cutoffs before selecting a final model.
 - Validate contribution explanations across representative examples and inspect them for text artifacts before any broader release.
+- Compare the generated residual and category plots at additional temporal cutoffs before selecting a model.
 - Keep image training deferred until the supervisor reviews the license conditions for image use and display.

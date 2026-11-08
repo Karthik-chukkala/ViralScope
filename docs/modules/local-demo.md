@@ -15,7 +15,8 @@ The selected model can be TF-IDF + Ridge, context CatBoost, or text + context Ri
 - `GET /`: review UI.
 - `GET /api/health`: local process health.
 - `GET /api/dataset`: full-train label summary/histogram and sample-only category/missing-title aggregates.
-- `GET /api/metrics`: train/holdout counts and model evaluation metrics from `artifacts/baseline-metrics.json`.
+- `GET /api/metrics`: train/holdout counts, aggregate metrics, residual summaries, and category slices from `artifacts/baseline-metrics.json`.
+- `GET /api/diagnostics/{filename}`: one of the allowlisted holdout diagnostic PNGs.
 - `POST /api/predict`: JSON input with `title`, `tags`, `category`, optional `subcategory` and `concept`, ISO `planned_at`, and model name.
 
 The service expects trained files under `artifacts/models/`; it returns HTTP 503 with a clear message if they are missing. Pydantic bounds text lengths and model names. Naive input datetimes are interpreted as UTC; the UI labels the planned time as UTC and submits an explicit UTC offset.
@@ -28,7 +29,7 @@ From the project root, after caching a sample and training models:
 .venv/bin/python -m uvicorn viralscope.demo_app:app --host 127.0.0.1 --port 8000
 ```
 
-Open `http://127.0.0.1:8000`. The server binds to loopback by default and is not exposed to the network. The page shows the full-train target distribution, clearly labeled sampled metadata category frequencies, chronological holdout SRC/MAE comparisons, and an estimate/explanation after submitting a draft.
+Open `http://127.0.0.1:8000`. The server binds to loopback by default and is not exposed to the network. The page shows the full-train target distribution, clearly labeled sampled metadata category frequencies, chronological holdout SRC/MAE comparisons, and a synthetic random-example control that fills draft fields and selects a model. Users can edit the example before requesting an estimate/explanation.
 
 ## Validation
 

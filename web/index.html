@@ -55,10 +55,12 @@
     }
     textarea { min-height: 92px; resize: vertical; line-height: 1.45; }
     input:focus, textarea:focus, select:focus { outline: 2px solid rgba(23, 104, 92, .22); border-color: var(--green); }
-    .submit-row { display: flex; align-items: center; gap: 14px; margin-top: 2px; }
+    .submit-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 2px; }
     button { flex: 0 0 auto; white-space: nowrap; border: 0; border-radius: 4px; background: var(--green); color: white; padding: 12px 17px; font: 700 14px "Trebuchet MS", Verdana, sans-serif; cursor: pointer; }
     button:hover { background: #10584e; }
     button:disabled { opacity: .65; cursor: wait; }
+    button.secondary { border: 1px solid var(--line); background: transparent; color: var(--ink); }
+    button.secondary:hover { border-color: var(--green); background: var(--mint); }
     .form-note { color: var(--muted); font-size: 11px; line-height: 1.45; }
     .result-area { border-left: 1px solid var(--line); padding-left: clamp(22px, 3vw, 42px); min-width: 0; }
     .result-head { display: flex; justify-content: space-between; align-items: start; gap: 16px; }
@@ -105,6 +107,11 @@
     .metric-model:nth-child(2) .bar { background: var(--gold); }
     .metric-model:nth-child(3) .bar { background: var(--coral); }
     .fine-print { max-width: 850px; margin: 18px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .diagnostics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+    .diagnostic-figure { min-width: 0; margin: 0; }
+    .diagnostic-figure:last-child { grid-column: 1 / -1; }
+    .diagnostic-figure img { display: block; width: 100%; height: auto; border: 1px solid var(--line); background: white; }
+    .diagnostic-figure figcaption { margin-top: 7px; color: var(--muted); font-size: 11px; line-height: 1.4; }
     footer { display: flex; justify-content: space-between; gap: 18px; padding: 16px clamp(20px, 5vw, 72px); border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
     footer strong { color: var(--ink); }
     @media (max-width: 850px) {
@@ -121,6 +128,8 @@
       .dataset-kpis { grid-template-columns: 1fr 1fr; }
       .dataset-grid { grid-template-columns: 1fr; gap: 24px; }
       .category-row { grid-template-columns: minmax(95px, 1fr) 1.3fr auto; gap: 8px; }
+      .diagnostics { grid-template-columns: 1fr; }
+      .diagnostic-figure:last-child { grid-column: auto; }
       footer { flex-direction: column; }
     }
   </style>
@@ -179,8 +188,9 @@
             </select>
           </label>
           <div class="submit-row">
+            <button id="random-example" class="secondary" type="button">Random example</button>
             <button id="submit-button" type="submit">Estimate score</button>
-            <span class="form-note">No image, account, or live platform data is sent.</span>
+            <span id="example-caption" class="form-note" aria-live="polite">Synthetic draft examples; no image, account, or live platform data is sent.</span>
           </div>
           <div id="form-error" class="error" role="alert"></div>
         </form>
@@ -235,6 +245,29 @@
       <div id="metrics" class="metric-grid"></div>
       <p class="fine-print">SRC measures ranking agreement (higher is better). MAE is the average absolute error in label units (lower is better). Scores are from a seven-shard sample and a local time-ordered holdout, not the official test set. Feature contributions describe model behavior, not causes.</p>
     </section>
+
+    <hr class="divider">
+    <section aria-labelledby="diagnostics-title">
+      <div class="metrics-head">
+        <h2 id="diagnostics-title">Holdout error diagnostics</h2>
+        <div class="sample-count">Local sample · n=8,546</div>
+      </div>
+      <div class="diagnostics">
+        <figure class="diagnostic-figure">
+          <img src="/api/diagnostics/holdout-actual-vs-predicted.png" alt="Actual versus predicted popularity labels for three models; the diagonal indicates perfect prediction.">
+          <figcaption>Predicted versus actual labels. Values cluster toward the center, especially for the context model.</figcaption>
+        </figure>
+        <figure class="diagnostic-figure">
+          <img src="/api/diagnostics/holdout-residuals.png" alt="Prediction error distributions for the text, context, and combined models, centered on zero error.">
+          <figcaption>Prediction error is predicted minus actual; positive values indicate overprediction.</figcaption>
+        </figure>
+        <figure class="diagnostic-figure">
+          <img src="/api/diagnostics/holdout-mae-by-category.png" alt="Mean absolute error by category for the three baseline models, including groups with at least 50 holdout posts.">
+          <figcaption>Category MAE slices include categories with at least 50 holdout posts. Smaller groups are omitted.</figcaption>
+        </figure>
+      </div>
+      <p class="fine-print">These diagnostics describe one chronological holdout drawn from seven sampled shards. They are exploratory and not official test performance.</p>
+    </section>
   </main>
   <footer>
     <strong>Powered by SMP Challenge</strong>
@@ -244,11 +277,93 @@
     const form = document.querySelector("#prediction-form");
     const button = document.querySelector("#submit-button");
     const errorBox = document.querySelector("#form-error");
+    const exampleButton = document.querySelector("#random-example");
+    const examples = [
+      {
+        name: "City after rain",
+        title: "Reflections after the rain",
+        tags: "city street reflections rain evening lights",
+        category: "Urban",
+        subcategory: "Street",
+        concept: "reflection",
+        planned_at: "2015-10-12T18:30"
+      },
+      {
+        name: "Weekend trail",
+        title: "A quiet path through the hills",
+        tags: "hiking trail hills outdoors weekend nature",
+        category: "Travel&Active&Sports",
+        subcategory: "Travel",
+        concept: "landscape",
+        planned_at: "2015-08-22T09:00"
+      },
+      {
+        name: "Homemade dessert",
+        title: "Fresh berry tart from the kitchen",
+        tags: "baking berries dessert homemade food sweet",
+        category: "Food",
+        subcategory: "Dessert",
+        concept: "berries",
+        planned_at: "2015-11-07T14:00"
+      },
+      {
+        name: "Garden visitor",
+        title: "A bright little bird in the garden",
+        tags: "bird garden wildlife morning nature color",
+        category: "Animal",
+        subcategory: "Birds",
+        concept: "garden",
+        planned_at: "2015-06-03T07:30"
+      },
+      {
+        name: "Autumn outfit",
+        title: "Layers for the first cool day",
+        tags: "fashion autumn jacket style outfit seasonal",
+        category: "Fashion",
+        subcategory: "Clothing",
+        concept: "autumn",
+        planned_at: "2015-09-18T12:00"
+      },
+      {
+        name: "Live music",
+        title: "A small stage with a big sound",
+        tags: "music live concert stage guitar performance",
+        category: "Entertainment",
+        subcategory: "Music",
+        concept: "concert",
+        planned_at: "2015-12-05T20:00"
+      }
+    ];
+    let previousExampleIndex = -1;
     const metricNames = {
       tfidf_ridge: "Text · TF-IDF + Ridge",
       context_catboost: "Context · CatBoost",
       text_context_ridge: "Text + context · Ridge"
     };
+
+    function loadRandomExample() {
+      let index = Math.floor(Math.random() * examples.length);
+      if (examples.length > 1 && index === previousExampleIndex) {
+        index = (index + 1 + Math.floor(Math.random() * (examples.length - 1))) % examples.length;
+      }
+      previousExampleIndex = index;
+      const example = examples[index];
+      for (const field of ["title", "tags", "category", "subcategory", "concept", "planned_at"]) {
+        form.elements[field].value = example[field];
+      }
+      const models = ["tfidf_ridge", "context_catboost", "text_context_ridge"];
+      form.elements.model.value = models[Math.floor(Math.random() * models.length)];
+      document.querySelector("#score").textContent = "—";
+      document.querySelector("#result-model").textContent = "";
+      document.querySelector("#explanations").replaceChildren();
+      document.querySelector("#explanation-note").textContent = "";
+      document.querySelector("#empty-state").hidden = false;
+      document.querySelector("#example-caption").textContent = `Example: ${example.name}. Synthetic input, not a held-out record.`;
+      errorBox.textContent = "";
+    }
+
+    exampleButton.addEventListener("click", loadRandomExample);
+    loadRandomExample();
 
     async function loadDataset() {
       const response = await fetch("/api/dataset");

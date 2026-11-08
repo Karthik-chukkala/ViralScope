@@ -24,6 +24,12 @@ MODEL_DIR = ROOT / "artifacts/models"
 METRICS_PATH = ROOT / "artifacts/baseline-metrics.json"
 TARGET_AUDIT_PATH = ROOT / "artifacts/train-target-audit.json"
 METADATA_EDA_PATH = ROOT / "artifacts/metadata-eda.json"
+DIAGNOSTIC_DIR = ROOT / "artifacts/diagnostics"
+DIAGNOSTIC_FILES = {
+    "holdout-actual-vs-predicted.png",
+    "holdout-residuals.png",
+    "holdout-mae-by-category.png",
+}
 WEB_PAGE = ROOT / "web/index.html"
 MODEL_CHOICES = ("tfidf_ridge", "context_catboost", "text_context_ridge")
 
@@ -123,7 +129,21 @@ def metrics() -> dict[str, Any]:
     if not METRICS_PATH.exists():
         raise HTTPException(status_code=503, detail="Baseline metrics are not available.")
     report = json_read_metrics()
-    return {"evaluation": report["evaluation"], "metrics": report["metrics"]}
+    return {
+        "evaluation": report["evaluation"],
+        "metrics": report["metrics"],
+        "diagnostics": report.get("diagnostics", {}),
+    }
+
+
+@app.get("/api/diagnostics/{filename}")
+def diagnostic_plot(filename: str) -> FileResponse:
+    if filename not in DIAGNOSTIC_FILES:
+        raise HTTPException(status_code=404, detail="Diagnostic plot not found.")
+    path = DIAGNOSTIC_DIR / filename
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail="Diagnostic plot is not available.")
+    return FileResponse(path, media_type="image/png")
 
 
 @app.get("/api/dataset")

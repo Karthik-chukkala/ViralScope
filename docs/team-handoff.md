@@ -44,10 +44,10 @@ The published training sample includes raw title/tag text but excludes IDs, prof
 2. **Sample metadata EDA:** aggregate missingness, ID uniqueness, categories, concepts, monthly counts, and title/tag lengths. Code: `viralscope/metadata_eda.py`; output: `artifacts/metadata-eda.json`.
 3. **Local modeling cache:** selected non-image columns plus `label`, saved to `data/train-sample.parquet`; provenance is in `data/train-sample-manifest.json`. Code: `viralscope/sample_cache.py`.
 4. **Baseline ladder:** median, TF-IDF + Ridge, context CatBoost, and text + context Ridge. Code: `viralscope/train_baselines.py`; metric report: `artifacts/baseline-metrics.json`; model files: `artifacts/models/`.
-5. **Inference and review site:** FastAPI serves the UI, aggregate dataset snapshot/histogram, category sample chart, holdout metrics, and prediction endpoint. Text models explain signed feature contributions; CatBoost uses SHAP values. Code: `viralscope/demo_app.py`, `web/index.html`.
+5. **Inference and review site:** FastAPI serves the UI, aggregate dataset snapshot/histogram, category sample chart, holdout metrics, residual/category diagnostics, and prediction endpoint. The form prefills a synthetic example and can shuffle to another draft/model without typing. Text models explain signed feature contributions; CatBoost uses SHAP values. Code: `viralscope/demo_app.py`, `web/index.html`.
 6. **Module documentation:** [Dataset Access and Audit](modules/dataset-access-and-audit.md), [Cleaning and EDA](modules/cleaning-and-eda.md), [Modeling Baselines](modules/modeling-baselines.md), and [Local Demo](modules/local-demo.md).
 
-The local site is currently running on loopback at port 8000. It was checked in a browser at desktop and mobile widths; form submission, dataset visualizations, and explanations work without horizontal overflow.
+The local site is currently running on loopback at port 8000. It was checked in a browser at desktop and mobile widths; form submission, dataset visualizations, holdout diagnostic plots, and explanations work without horizontal overflow.
 
 ## 4. Model Results
 
@@ -61,6 +61,8 @@ The evaluation uses all 42,730 sample rows with a chronological split: 34,184 tr
 | Text + context Ridge | 0.941 | 0.642 | 0.578 | 1.642 | 2.066 | 0.314 |
 
 Text + context slightly improves SRC over text alone, but is slightly worse on MAE, RMSE, and R². Therefore, the current evidence does not show that fusion improves overall score estimation. Large train/holdout gaps indicate overfit, especially for sparse text features. Parameters were not tuned on the holdout.
+
+The holdout diagnostic report shows mean prediction errors of +0.543 for TF-IDF Ridge, +0.131 for context CatBoost, and +0.537 for text + context Ridge (positive means overprediction). Within two label units, the models cover 68.4%, 59.1%, and 67.2% of holdout rows, respectively. Category MAE slices and actual/predicted and residual plots are saved under `artifacts/diagnostics/`; these remain sample-only diagnostics.
 
 The split is chronological, but it is **not user-independent**: user IDs were omitted from the modeling cache, so user overlap cannot be measured. Before making an unseen-user generalization claim, add a separate split-only ID column and evaluate a user-aware protocol without passing IDs into the model. The seven-shard sampling method is another important limitation.
 
@@ -87,9 +89,9 @@ HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.sample_cache --sam
 
 Hugging Face commands require the local credential. `HF_HUB_DOWNLOAD_TIMEOUT=120` avoids the client's default 10-second timeout on shard reads. Never put credentials in the repository or paste them into logs.
 
-The API routes are `GET /api/health`, `GET /api/dataset`, `GET /api/metrics`, and `POST /api/predict`. Prediction input is title, tags, category, optional subcategory/concept, planned UTC datetime, and model name (`tfidf_ridge`, `context_catboost`, or `text_context_ridge`).
+The API routes are `GET /api/health`, `GET /api/dataset`, `GET /api/metrics`, `GET /api/diagnostics/{filename}`, and `POST /api/predict`. Prediction input is title, tags, category, optional subcategory/concept, planned UTC datetime, and model name (`tfidf_ridge`, `context_catboost`, or `text_context_ridge`).
 
-Latest test result: **12 tests passed**. API smoke checks returned HTTP 200 for health, dataset summary, metrics, and predictions/explanations from all three saved models.
+Latest test result: **14 tests passed**. API smoke checks returned HTTP 200 for health, dataset summary, metrics, diagnostic plots, and predictions/explanations from all three saved models.
 
 ## 6. What Remains
 

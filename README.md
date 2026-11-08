@@ -4,7 +4,7 @@ ViralScope is a research prototype for estimating the historical SMP Challenge p
 
 ## Current Demo
 
-The local FastAPI demo serves a dataset snapshot, sampled category analysis, chronological holdout metrics, and an interactive prediction form with feature contributions. Start it after generating the local data/model artifacts:
+The local FastAPI demo serves a dataset snapshot, sampled category analysis, chronological holdout metrics, residual/category diagnostic plots, and an interactive prediction form with feature contributions and random synthetic examples. Start it after generating the local data/model artifacts:
 
 ```bash
 .venv/bin/python -m uvicorn viralscope.demo_app:app --host 127.0.0.1 --port 8000

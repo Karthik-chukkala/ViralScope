@@ -9,8 +9,11 @@ from pathlib import Path
 from typing import Any
 
 import joblib
+import matplotlib
 import numpy as np
 import pandas as pd
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 from catboost import CatBoostRegressor
 from scipy.stats import spearmanr
 from sklearn.compose import ColumnTransformer
@@ -24,6 +27,7 @@ DEFAULT_DATA = Path("data/train-sample.parquet")
 DEFAULT_MANIFEST = Path("data/train-sample-manifest.json")
 DEFAULT_REPORT = Path("artifacts/baseline-metrics.json")
 DEFAULT_MODEL_DIR = Path("artifacts/models")
+DEFAULT_DIAGNOSTIC_DIR = Path("artifacts/diagnostics")
 CATEGORICAL_FEATURES = ["Category", "Subcategory", "Concept"]
 TIME_FEATURES = [
     "hour_sin",
@@ -95,7 +99,11 @@ def _metrics(actual: np.ndarray, predicted: np.ndarray) -> dict[str, float | Non
         "src": correlation if correlation is not None and np.isfinite(correlation) else None,
         "mae": float(mean_absolute_error(actual, predicted)),
         "rmse": float(np.sqrt(mean_squared_error(actual, predicted))),
-        "r2": float(r2_score(actual, predicted)),
+        "r2": (
+            float(r2_score(actual, predicted))
+            if len(actual) > 1 and np.unique(actual).size > 1
+            else None
+        ),
     }
 
 
@@ -110,6 +118,101 @@ def _record_metrics(
         "train": _metrics(labels[train_indexes], train_predictions),
         "holdout": _metrics(labels[holdout_indexes], holdout_predictions),
     }
+
+
+def summarize_residuals(actual: np.ndarray, predicted: np.ndarray) -> dict[str, Any]:
+    residuals = np.asarray(predicted, dtype=np.float64) - np.asarray(actual, dtype=np.float64)
+    absolute_errors = np.abs(residuals)
+    return {
+        "rows": int(residuals.size),
+        "mean_error_prediction_minus_actual": float(residuals.mean()),
+        "median_absolute_error": float(np.median(absolute_errors)),
+        "p90_absolute_error": float(np.quantile(absolute_errors, 0.9)),
+        "p95_absolute_error": float(np.quantile(absolute_errors, 0.95)),
+        "within_1_label_unit": float(np.mean(absolute_errors <= 1.0)),
+        "within_2_label_units": float(np.mean(absolute_errors <= 2.0)),
+    }
+
+
+def _holdout_category_metrics(
+    categories: np.ndarray,
+    actual: np.ndarray,
+    predictions: dict[str, np.ndarray],
+    minimum_rows: int = 50,
+) -> dict[str, Any]:
+    report: dict[str, Any] = {}
+    for category in sorted(set(categories)):
+        indexes = np.flatnonzero(categories == category)
+        if len(indexes) < minimum_rows:
+            continue
+        report[str(category)] = {
+            "rows": int(len(indexes)),
+            "models": {
+                name: _metrics(actual[indexes], values[indexes])
+                for name, values in predictions.items()
+            },
+        }
+    return report
+
+
+def _save_diagnostic_plots(
+    output_dir: Path,
+    actual: np.ndarray,
+    predictions: dict[str, np.ndarray],
+    category_metrics: dict[str, Any],
+) -> list[str]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    model_names = ["tfidf_ridge", "context_catboost", "text_context_ridge"]
+    model_labels = ["Text TF-IDF + Ridge", "Context CatBoost", "Text + context"]
+    plot_paths: list[str] = []
+
+    figure, axes = plt.subplots(1, 3, figsize=(13, 4), constrained_layout=True)
+    lower = float(min(actual.min(), *(predictions[name].min() for name in model_names)))
+    upper = float(max(actual.max(), *(predictions[name].max() for name in model_names)))
+    for axis, name, label in zip(axes, model_names, model_labels):
+        axis.scatter(actual, predictions[name], s=7, alpha=0.16, color="#17685c", rasterized=True)
+        axis.plot([lower, upper], [lower, upper], color="#c34f3c", linewidth=1)
+        axis.set_title(label)
+        axis.set_xlabel("Actual label")
+        axis.set_ylabel("Predicted label")
+        axis.grid(alpha=0.2)
+    prediction_plot = output_dir / "holdout-actual-vs-predicted.png"
+    figure.savefig(prediction_plot, dpi=150)
+    plt.close(figure)
+    plot_paths.append(str(prediction_plot))
+
+    figure, axes = plt.subplots(1, 3, figsize=(13, 4), constrained_layout=True)
+    for axis, name, label in zip(axes, model_names, model_labels):
+        axis.hist(predictions[name] - actual, bins=35, color="#4b9b87", edgecolor="white")
+        axis.axvline(0, color="#c34f3c", linewidth=1)
+        axis.set_title(label)
+        axis.set_xlabel("Prediction error")
+        axis.set_ylabel("Posts")
+        axis.grid(axis="y", alpha=0.2)
+    residual_plot = output_dir / "holdout-residuals.png"
+    figure.savefig(residual_plot, dpi=150)
+    plt.close(figure)
+    plot_paths.append(str(residual_plot))
+
+    categories_to_plot = list(category_metrics)
+    if categories_to_plot:
+        indexes = np.arange(len(categories_to_plot))
+        width = 0.24
+        figure, axis = plt.subplots(figsize=(max(10, len(categories_to_plot) * 0.8), 5))
+        for offset, name, label in zip((-width, 0, width), model_names, model_labels):
+            values = [category_metrics[category]["models"][name]["mae"] for category in categories_to_plot]
+            axis.bar(indexes + offset, values, width, label=label)
+        axis.set_xticks(indexes, categories_to_plot, rotation=35, ha="right")
+        axis.set_ylabel("Holdout MAE")
+        axis.set_title("Holdout error by category (minimum 50 posts)")
+        axis.legend(frameon=False)
+        axis.grid(axis="y", alpha=0.2)
+        figure.tight_layout()
+        category_plot = output_dir / "holdout-mae-by-category.png"
+        figure.savefig(category_plot, dpi=150)
+        plt.close(figure)
+        plot_paths.append(str(category_plot))
+    return plot_paths
 
 
 def train_baselines(
@@ -133,27 +236,40 @@ def train_baselines(
 
     model_dir.mkdir(parents=True, exist_ok=True)
     results: dict[str, Any] = {}
+    predictions: dict[str, dict[str, np.ndarray]] = {}
     median_value = float(np.median(train_labels))
+    median_train_prediction = np.full(len(train_indexes), median_value)
+    median_holdout_prediction = np.full(len(holdout_indexes), median_value)
     results["median"] = _record_metrics(
         labels,
         train_indexes,
         holdout_indexes,
-        np.full(len(train_indexes), median_value),
-        np.full(len(holdout_indexes), median_value),
+        median_train_prediction,
+        median_holdout_prediction,
     )
+    predictions["median"] = {
+        "train": median_train_prediction,
+        "holdout": median_holdout_prediction,
+    }
 
     vectorizer = TfidfVectorizer(
         ngram_range=(1, 2), min_df=2, max_features=150_000, sublinear_tf=True
     )
     text_model = Pipeline([("tfidf", vectorizer), ("regressor", Ridge(alpha=2.0))])
     text_model.fit(train["text"], train_labels)
+    text_train_prediction = text_model.predict(train["text"])
+    text_holdout_prediction = text_model.predict(holdout["text"])
     results["tfidf_ridge"] = _record_metrics(
         labels,
         train_indexes,
         holdout_indexes,
-        text_model.predict(train["text"]),
-        text_model.predict(holdout["text"]),
+        text_train_prediction,
+        text_holdout_prediction,
     )
+    predictions["tfidf_ridge"] = {
+        "train": text_train_prediction,
+        "holdout": text_holdout_prediction,
+    }
     joblib.dump(text_model, model_dir / "tfidf-ridge.joblib")
 
     context_features = CATEGORICAL_FEATURES + TIME_FEATURES
@@ -172,13 +288,19 @@ def train_baselines(
         train_labels,
         cat_features=CATEGORICAL_FEATURES,
     )
+    context_train_prediction = context_model.predict(train[context_features])
+    context_holdout_prediction = context_model.predict(holdout[context_features])
     results["context_catboost"] = _record_metrics(
         labels,
         train_indexes,
         holdout_indexes,
-        context_model.predict(train[context_features]),
-        context_model.predict(holdout[context_features]),
+        context_train_prediction,
+        context_holdout_prediction,
     )
+    predictions["context_catboost"] = {
+        "train": context_train_prediction,
+        "holdout": context_holdout_prediction,
+    }
     context_model.save_model(str(model_dir / "context-catboost.cbm"))
 
     fused_features = ColumnTransformer(
@@ -206,16 +328,39 @@ def train_baselines(
         [("features", fused_features), ("regressor", Ridge(alpha=2.0))]
     )
     fused_model.fit(train, train_labels)
+    fused_train_prediction = fused_model.predict(train)
+    fused_holdout_prediction = fused_model.predict(holdout)
     results["text_context_ridge"] = _record_metrics(
         labels,
         train_indexes,
         holdout_indexes,
-        fused_model.predict(train),
-        fused_model.predict(holdout),
+        fused_train_prediction,
+        fused_holdout_prediction,
     )
+    predictions["text_context_ridge"] = {
+        "train": fused_train_prediction,
+        "holdout": fused_holdout_prediction,
+    }
     joblib.dump(fused_model, model_dir / "text-context-ridge.joblib")
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    holdout_predictions = {
+        name: values["holdout"]
+        for name, values in predictions.items()
+        if name != "median"
+    }
+    holdout_categories = features.iloc[holdout_indexes]["Category"].to_numpy()
+    category_metrics = _holdout_category_metrics(
+        holdout_categories,
+        holdout_labels,
+        holdout_predictions,
+    )
+    diagnostic_plots = _save_diagnostic_plots(
+        DEFAULT_DIAGNOSTIC_DIR,
+        holdout_labels,
+        holdout_predictions,
+        category_metrics,
+    )
     report = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "dataset": manifest,
@@ -229,6 +374,15 @@ def train_baselines(
             "official_test_scored": False,
         },
         "metrics": results,
+        "diagnostics": {
+            "residuals": {
+                name: summarize_residuals(holdout_labels, values)
+                for name, values in holdout_predictions.items()
+            },
+            "holdout_by_category": category_metrics,
+            "minimum_category_rows": 50,
+            "plots": diagnostic_plots,
+        },
         "models": {
             "tfidf_ridge": "artifacts/models/tfidf-ridge.joblib",
             "context_catboost": "artifacts/models/context-catboost.cbm",
