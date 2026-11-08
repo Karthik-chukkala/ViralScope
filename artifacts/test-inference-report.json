@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-11-08T09:22:11.515821+00:00",
+  "generated_at_utc": "2026-11-08T10:06:43.540240+00:00",
   "dataset": {
     "generated_at_utc": "2026-11-08T08:01:08.063650+00:00",
     "dataset": "smpchallenge/SMP-Image",
@@ -53,6 +53,113 @@
     "images_downloaded": false
   },
   "prediction_rows": 180581,
+  "input_eda": {
+    "rows": 180581,
+    "missing_or_blank": {
+      "Postdate": 0,
+      "Category": 0,
+      "Title": 3966,
+      "Alltags": 7
+    },
+    "invalid_timestamp_count": 0,
+    "postdate_range_utc": {
+      "min": "2016-02-29T16:00:00+00:00",
+      "max": "2016-06-10T15:59:01+00:00"
+    },
+    "monthly_posts_utc": [
+      {
+        "month": "2016-02",
+        "count": 342
+      },
+      {
+        "month": "2016-03",
+        "count": 36563
+      },
+      {
+        "month": "2016-04",
+        "count": 18020
+      },
+      {
+        "month": "2016-05",
+        "count": 66346
+      },
+      {
+        "month": "2016-06",
+        "count": 59310
+      }
+    ],
+    "category_frequencies": [
+      {
+        "category": "Travel&Active&Sports",
+        "count": 45462
+      },
+      {
+        "category": "Holiday&Celebrations",
+        "count": 19485
+      },
+      {
+        "category": "Animal",
+        "count": 18482
+      },
+      {
+        "category": "Entertainment",
+        "count": 17969
+      },
+      {
+        "category": "Fashion",
+        "count": 17961
+      },
+      {
+        "category": "Whether&Season",
+        "count": 14926
+      },
+      {
+        "category": "Social&People",
+        "count": 14447
+      },
+      {
+        "category": "Urban",
+        "count": 12000
+      },
+      {
+        "category": "Food",
+        "count": 11833
+      },
+      {
+        "category": "Electronics",
+        "count": 5987
+      },
+      {
+        "category": "Family",
+        "count": 2029
+      }
+    ],
+    "title_character_lengths": {
+      "count": 176615,
+      "min": 1,
+      "median": 18.0,
+      "mean": 27.863012767884946,
+      "max": 259
+    },
+    "title_word_counts": {
+      "count": 176615,
+      "min": 1,
+      "median": 3.0,
+      "mean": 4.144738555615321,
+      "max": 57
+    },
+    "tag_token_counts": {
+      "count": 180574,
+      "min": 1,
+      "median": 13.0,
+      "mean": 18.092626845503784,
+      "max": 75
+    },
+    "labels_read": false,
+    "ids_read": false,
+    "images_read": false
+  },
+  "input_eda_plot": "artifacts/diagnostics/test-input-coverage.png",
   "models": {
     "tfidf_ridge": {
       "rows": 180581,

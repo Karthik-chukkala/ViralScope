@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ViralScope | References</title>
+  <link rel="stylesheet" href="/web/presentation.css?v=20261108-14">
+  <script defer src="/web/image-viewer.js?v=20261110"></script>
+</head>
+<body data-page="references">
+  <header>
+    <a class="brand" href="/"><strong>ViralScope</strong><span>benchmark lab</span></a>
+    <nav class="site-nav" aria-label="Project pages">
+      <a href="/">Dashboard</a><a href="/dataset">Dataset</a><a href="/models">Models</a><a href="/demo">Demo</a><a href="/solutions">Solutions</a><a href="/references" aria-current="page">References</a>
+    </nav>
+    <span class="header-note">Sources and reproducibility</span>
+  </header>
+  <main>
+    <section class="page-head">
+      <div>
+        <h1>References and source links</h1>
+        <p class="lede">Primary sources used for task definition, dataset interpretation, model-family context, and project reproduction.</p>
+      </div>
+      <div class="scope">Dataset revision<br><span>f131dba653a05c0e3c6294388f81ed3fbd9c71a0</span></div>
+    </section>
+    <section class="section">
+      <h2>Research papers</h2>
+      <div class="rule-list">
+        <article class="rule"><b>2019 · SMP Challenge task overview</b><p>Bo Wu et al. “SMP Challenge: An Overview of Social Media Prediction Challenge 2019.” ACM Multimedia 2019.</p><a href="https://arxiv.org/abs/1910.01795" target="_blank" rel="noreferrer">arXiv:1910.01795</a></article>
+        <article class="rule"><b>2023/2024 · Challenge methods and baseline analysis</b><p>Bo Wu et al. “SMP Challenge: An Overview and Analysis of Social Media Prediction Challenge.” ACM Multimedia 2023; arXiv version submitted 2024.</p><a href="https://arxiv.org/abs/2405.10497" target="_blank" rel="noreferrer">arXiv:2405.10497</a></article>
+        <article class="rule"><b>Related challenge model families</b><p>The overview discusses ensemble/boosting, CNN visual representations, RNN temporal models, and attention/transformer approaches. ViralScope's six models are controlled text/context baselines, not exact reproductions of these systems.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <h2>Dataset and challenge</h2>
+      <div class="rule-list">
+        <article class="rule"><b>Hugging Face dataset</b><p>SMP-Image, pinned revision `f131dba653a05c0e3c6294388f81ed3fbd9c71a0`. The train cache includes text/context/label columns; test inputs are inference-only.</p><a href="https://huggingface.co/datasets/smpchallenge/SMP-Image" target="_blank" rel="noreferrer">Open SMP-Image on Hugging Face</a></article>
+        <article class="rule"><b>SMP Challenge website</b><p>Current challenge information, separate image/video tracks, and dataset descriptions. Website snapshots may describe different release scopes; this project pins its exact HF revision.</p><a href="https://smp-challenge.com/" target="_blank" rel="noreferrer">Open SMP Challenge</a></article>
+        <article class="rule"><b>License and attribution</b><p>The project includes the SMP Challenge Community License and `Notice`. The incorporated AUP remains a reuse/publication gate; images are not distributed or displayed.</p><a href="/LICENSE-SMP-CHALLENGE.md">Open repository license copy</a></article>
+      </div>
+    </section>
+    <section class="section">
+      <h2>Local project documents</h2>
+      <div class="rule-list">
+        <a href="/docs/team-handoff.md">Team handoff and current metrics</a>
+        <a href="/docs/research-and-project-blueprint.md">Research and project blueprint</a>
+        <a href="/docs/modules/dataset-access-and-audit.md">Dataset access and audit</a>
+        <a href="/docs/modules/cleaning-and-eda.md">Cleaning and EDA</a>
+        <a href="/docs/modules/modeling-baselines.md">Modeling baselines</a>
+        <a href="/docs/modules/review-validation.md">Review validation checks</a>
+        <a href="/docs/modules/local-demo.md">Local demo</a>
+      </div>
+    </section>
+  </main>
+  <footer><strong>Powered by SMP Challenge</strong><span>Research references and reproducibility links</span></footer>
+</body>
+</html>

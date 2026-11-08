@@ -1,0 +1,719 @@
+{
+  "generated_at_utc": "2026-11-08T13:22:14.792684+00:00",
+  "dataset": {
+    "generated_at_utc": "2026-11-08T07:26:14.222023+00:00",
+    "dataset": "smpchallenge/SMP-Image",
+    "revision": "f131dba653a05c0e3c6294388f81ed3fbd9c71a0",
+    "split": "train",
+    "rows": 305613,
+    "columns": [
+      "Postdate",
+      "Category",
+      "Subcategory",
+      "Concept",
+      "Title",
+      "Alltags",
+      "label"
+    ],
+    "sample_method": "all_train_shards",
+    "shards_available": 49,
+    "shards_selected": [
+      "data/train-00000.parquet",
+      "data/train-00001.parquet",
+      "data/train-00002.parquet",
+      "data/train-00003.parquet",
+      "data/train-00004.parquet",
+      "data/train-00005.parquet",
+      "data/train-00006.parquet",
+      "data/train-00007.parquet",
+      "data/train-00008.parquet",
+      "data/train-00009.parquet",
+      "data/train-00010.parquet",
+      "data/train-00011.parquet",
+      "data/train-00012.parquet",
+      "data/train-00013.parquet",
+      "data/train-00014.parquet",
+      "data/train-00015.parquet",
+      "data/train-00016.parquet",
+      "data/train-00017.parquet",
+      "data/train-00018.parquet",
+      "data/train-00019.parquet",
+      "data/train-00020.parquet",
+      "data/train-00021.parquet",
+      "data/train-00022.parquet",
+      "data/train-00023.parquet",
+      "data/train-00024.parquet",
+      "data/train-00025.parquet",
+      "data/train-00026.parquet",
+      "data/train-00027.parquet",
+      "data/train-00028.parquet",
+      "data/train-00029.parquet",
+      "data/train-00030.parquet",
+      "data/train-00031.parquet",
+      "data/train-00032.parquet",
+      "data/train-00033.parquet",
+      "data/train-00034.parquet",
+      "data/train-00035.parquet",
+      "data/train-00036.parquet",
+      "data/train-00037.parquet",
+      "data/train-00038.parquet",
+      "data/train-00039.parquet",
+      "data/train-00040.parquet",
+      "data/train-00041.parquet",
+      "data/train-00042.parquet",
+      "data/train-00043.parquet",
+      "data/train-00044.parquet",
+      "data/train-00045.parquet",
+      "data/train-00046.parquet",
+      "data/train-00047.parquet",
+      "data/train-00048.parquet"
+    ],
+    "images_downloaded": false,
+    "profile_and_location_fields_cached": false,
+    "local_cache_contains_post_text": true
+  },
+  "evaluation": {
+    "protocol": "future-time and unseen-user local holdout from full pinned train split; pre-cutoff rows from holdout users are purged from training",
+    "holdout_fraction_requested": 0.2,
+    "holdout_fraction_unit": "post_rows",
+    "split_unit": "future_time_unseen_user",
+    "cutoff_utc": "2016-01-17T11:26:49+00:00",
+    "valid_rows": 305613,
+    "train_rows": 177604,
+    "holdout_rows": 61123,
+    "official_test_scored": false,
+    "train_user_count": 26520,
+    "holdout_user_count": 11792,
+    "user_overlap_count": 0,
+    "train_time_max_utc": "2016-01-17T11:26:45+00:00",
+    "purged_rows": 66886,
+    "purged_user_count": 4836,
+    "holdout_time_min_utc": "2016-01-17T11:26:49+00:00",
+    "holdout_time_max_utc": "2016-02-29T15:54:26+00:00"
+  },
+  "metrics": {
+    "median": {
+      "train": {
+        "src": null,
+        "mae": 1.905962541174189,
+        "rmse": 2.428157022568057,
+        "r2": -0.00628057129862003
+      },
+      "holdout": {
+        "src": null,
+        "mae": 1.9981072687083485,
+        "rmse": 2.5086106332170237,
+        "r2": -0.0245181838578743
+      }
+    },
+    "tfidf_ridge": {
+      "train": {
+        "src": 0.9281054502633087,
+        "mae": 0.587526927038382,
+        "rmse": 0.9542223827531476,
+        "r2": 0.8445950848955652
+      },
+      "holdout": {
+        "src": 0.486405850718236,
+        "mae": 1.761585708489602,
+        "rmse": 2.1912037178106973,
+        "r2": 0.2183386009373639
+      }
+    },
+    "tfidf_sgd": {
+      "train": {
+        "src": 0.8017839965957122,
+        "mae": 1.0663489468373974,
+        "rmse": 1.54816132983692,
+        "r2": 0.590929668755242
+      },
+      "holdout": {
+        "src": 0.4623070532783779,
+        "mae": 1.756100110342182,
+        "rmse": 2.190746648368418,
+        "r2": 0.21866466489432324
+      }
+    },
+    "tfidf_sgd_huber": {
+      "train": {
+        "src": 0.404232354944203,
+        "mae": 1.7680394087326767,
+        "rmse": 2.3649102666499293,
+        "r2": 0.04545834549426697
+      },
+      "holdout": {
+        "src": 0.28294478927556627,
+        "mae": 2.002034092214579,
+        "rmse": 2.5318015308448976,
+        "r2": -0.04354809512139579
+      }
+    },
+    "context_catboost": {
+      "train": {
+        "src": 0.7525436418807738,
+        "mae": 1.136416949511955,
+        "rmse": 1.6437291432578836,
+        "r2": 0.5388671492236053
+      },
+      "holdout": {
+        "src": 0.22878952688816429,
+        "mae": 1.9685266404634558,
+        "rmse": 2.4450232119764976,
+        "r2": 0.026761845846878907
+      }
+    },
+    "context_catboost_shallow": {
+      "train": {
+        "src": 0.6813560058749852,
+        "mae": 1.319976673383926,
+        "rmse": 1.8253256452860407,
+        "r2": 0.4313484035207019
+      },
+      "holdout": {
+        "src": 0.23888879992418838,
+        "mae": 1.9507720681957237,
+        "rmse": 2.4301475727903883,
+        "r2": 0.03856827658165107
+      }
+    },
+    "text_context_ridge": {
+      "train": {
+        "src": 0.9328964113004462,
+        "mae": 0.563724463449812,
+        "rmse": 0.9114467265669605,
+        "r2": 0.8582157041458511
+      },
+      "holdout": {
+        "src": 0.5146107168173183,
+        "mae": 1.7332099293670684,
+        "rmse": 2.140871463888567,
+        "r2": 0.25383591699271024
+      }
+    }
+  },
+  "diagnostics": {
+    "residuals": {
+      "tfidf_ridge": {
+        "rows": 61123,
+        "mean_error_prediction_minus_actual": 0.5467420887931366,
+        "median_absolute_error": 1.5230183245588034,
+        "p90_absolute_error": 3.6007498436123755,
+        "p95_absolute_error": 4.314726265304084,
+        "within_1_label_unit": 0.33352420529097065,
+        "within_2_label_units": 0.637239664283494
+      },
+      "tfidf_sgd": {
+        "rows": 61123,
+        "mean_error_prediction_minus_actual": 0.29032360042939725,
+        "median_absolute_error": 1.493695337498556,
+        "p90_absolute_error": 3.564119639821068,
+        "p95_absolute_error": 4.274961628546776,
+        "within_1_label_unit": 0.34689069581008786,
+        "within_2_label_units": 0.6350473635129166
+      },
+      "tfidf_sgd_huber": {
+        "rows": 61123,
+        "mean_error_prediction_minus_actual": -0.8597325039253781,
+        "median_absolute_error": 1.6831198767667477,
+        "p90_absolute_error": 4.135778808328888,
+        "p95_absolute_error": 4.951671212448115,
+        "within_1_label_unit": 0.31943785481733555,
+        "within_2_label_units": 0.5775403694190403
+      },
+      "context_catboost": {
+        "rows": 61123,
+        "mean_error_prediction_minus_actual": 0.09550585256529642,
+        "median_absolute_error": 1.681277236445725,
+        "p90_absolute_error": 4.006506549129124,
+        "p95_absolute_error": 4.682944819341206,
+        "within_1_label_unit": 0.3034209708293114,
+        "within_2_label_units": 0.5792909379447998
+      },
+      "context_catboost_shallow": {
+        "rows": 61123,
+        "mean_error_prediction_minus_actual": -0.057503084867112246,
+        "median_absolute_error": 1.6805752502513522,
+        "p90_absolute_error": 3.9801355472705637,
+        "p95_absolute_error": 4.633199847115038,
+        "within_1_label_unit": 0.31115946534037925,
+        "within_2_label_units": 0.580141681527412
+      },
+      "text_context_ridge": {
+        "rows": 61123,
+        "mean_error_prediction_minus_actual": 0.47953596084598027,
+        "median_absolute_error": 1.5296230542510934,
+        "p90_absolute_error": 3.4753700840066535,
+        "p95_absolute_error": 4.1197873971603105,
+        "within_1_label_unit": 0.3345221929551887,
+        "within_2_label_units": 0.635947188456064
+      }
+    },
+    "holdout_by_category": {
+      "Animal": {
+        "rows": 4789,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.46019878045836765,
+            "mae": 1.7651989431958492,
+            "rmse": 2.1476306505802505,
+            "r2": 0.035881910991611976
+          },
+          "tfidf_sgd": {
+            "src": 0.4389500860184743,
+            "mae": 1.71568226612885,
+            "rmse": 2.0792621551117536,
+            "r2": 0.09628905474011473
+          },
+          "tfidf_sgd_huber": {
+            "src": 0.29489164982856453,
+            "mae": 1.7004543947619253,
+            "rmse": 2.1554686300906556,
+            "r2": 0.028831790583821904
+          },
+          "context_catboost": {
+            "src": 0.09519299644123833,
+            "mae": 1.9369674527007907,
+            "rmse": 2.33123131697141,
+            "r2": -0.13600902471407617
+          },
+          "context_catboost_shallow": {
+            "src": 0.15047075577306818,
+            "mae": 1.8790440034370675,
+            "rmse": 2.279884706965428,
+            "r2": -0.08651772373894873
+          },
+          "text_context_ridge": {
+            "src": 0.4581502635436253,
+            "mae": 1.7335751291606192,
+            "rmse": 2.079186047431252,
+            "r2": 0.09635521098207411
+          }
+        }
+      },
+      "Electronics": {
+        "rows": 1575,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.2538557834314213,
+            "mae": 2.322269223298143,
+            "rmse": 2.8225236424643017,
+            "r2": 0.047787438714784636
+          },
+          "tfidf_sgd": {
+            "src": 0.06279562611416327,
+            "mae": 2.446175925930449,
+            "rmse": 2.978706876288184,
+            "r2": -0.0605087725732909
+          },
+          "tfidf_sgd_huber": {
+            "src": 0.23197349515698426,
+            "mae": 2.3105963537401175,
+            "rmse": 2.8046000592223983,
+            "r2": 0.059842516832703585
+          },
+          "context_catboost": {
+            "src": 0.33519684924518023,
+            "mae": 2.287782784873422,
+            "rmse": 2.8192481485385708,
+            "r2": 0.0499962115009821
+          },
+          "context_catboost_shallow": {
+            "src": 0.43352184025786183,
+            "mae": 2.280905512278848,
+            "rmse": 2.748687250501263,
+            "r2": 0.09695501435769804
+          },
+          "text_context_ridge": {
+            "src": 0.48413905045166045,
+            "mae": 1.9891681018382572,
+            "rmse": 2.4782923700178343,
+            "r2": 0.2658854884517302
+          }
+        }
+      },
+      "Entertainment": {
+        "rows": 6583,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.3672772933727893,
+            "mae": 1.9846167741085494,
+            "rmse": 2.41256439688117,
+            "r2": 0.05231327503804373
+          },
+          "tfidf_sgd": {
+            "src": 0.401665308580379,
+            "mae": 1.9313154438964115,
+            "rmse": 2.336264892584516,
+            "r2": 0.11130828006659299
+          },
+          "tfidf_sgd_huber": {
+            "src": 0.27483103421204047,
+            "mae": 2.0015510439510247,
+            "rmse": 2.4410254505502733,
+            "r2": 0.02982164061485071
+          },
+          "context_catboost": {
+            "src": 0.05908999073011593,
+            "mae": 2.2163230136947463,
+            "rmse": 2.731977830415939,
+            "r2": -0.21523791177091045
+          },
+          "context_catboost_shallow": {
+            "src": 0.08754368712068689,
+            "mae": 2.1514791307702623,
+            "rmse": 2.6612924152340605,
+            "r2": -0.15316688009007717
+          },
+          "text_context_ridge": {
+            "src": 0.3366771611884902,
+            "mae": 1.999157463920114,
+            "rmse": 2.443690356291335,
+            "r2": 0.027702166474555256
+          }
+        }
+      },
+      "Family": {
+        "rows": 609,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.511433329068252,
+            "mae": 1.7882448682916587,
+            "rmse": 2.2020927370099432,
+            "r2": 0.13993389919820476
+          },
+          "tfidf_sgd": {
+            "src": 0.44120817447986993,
+            "mae": 1.8221577018856467,
+            "rmse": 2.1933880177891365,
+            "r2": 0.14672002289046004
+          },
+          "tfidf_sgd_huber": {
+            "src": 0.2809247764778693,
+            "mae": 1.8801704787124862,
+            "rmse": 2.4288611303939156,
+            "r2": -0.046323527807180964
+          },
+          "context_catboost": {
+            "src": 0.17153607882127772,
+            "mae": 1.884541132872972,
+            "rmse": 2.443154044078685,
+            "r2": -0.058674183782031486
+          },
+          "context_catboost_shallow": {
+            "src": 0.1644261515805173,
+            "mae": 1.88676338950146,
+            "rmse": 2.417763628434678,
+            "r2": -0.03678403580284417
+          },
+          "text_context_ridge": {
+            "src": 0.5662648507095024,
+            "mae": 1.7390822687255854,
+            "rmse": 2.0792856988090804,
+            "r2": 0.23318790494554864
+          }
+        }
+      },
+      "Fashion": {
+        "rows": 10480,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.6180151394712278,
+            "mae": 1.691775985162025,
+            "rmse": 2.0835758989056163,
+            "r2": 0.32151195559903556
+          },
+          "tfidf_sgd": {
+            "src": 0.554312078681682,
+            "mae": 1.7116376494126793,
+            "rmse": 2.1303208879463487,
+            "r2": 0.29072671832430785
+          },
+          "tfidf_sgd_huber": {
+            "src": 0.3461132929865146,
+            "mae": 2.3322379937479454,
+            "rmse": 2.9061534849761834,
+            "r2": -0.3199596139181844
+          },
+          "context_catboost": {
+            "src": 0.18214949747679432,
+            "mae": 2.047314441672994,
+            "rmse": 2.534840566464574,
+            "r2": -0.004210704463554427
+          },
+          "context_catboost_shallow": {
+            "src": 0.21792226022813066,
+            "mae": 2.0292943005119755,
+            "rmse": 2.5305040393819493,
+            "r2": -0.0007776980989411264
+          },
+          "text_context_ridge": {
+            "src": 0.6175165426006101,
+            "mae": 1.6999463750581547,
+            "rmse": 2.0986631129022215,
+            "r2": 0.311650490361702
+          }
+        }
+      },
+      "Food": {
+        "rows": 4251,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.09699887013202152,
+            "mae": 2.045542569372656,
+            "rmse": 2.4771961067952524,
+            "r2": -0.10749996292474262
+          },
+          "tfidf_sgd": {
+            "src": 0.20826538177077325,
+            "mae": 1.8866273822199686,
+            "rmse": 2.3172414472045486,
+            "r2": 0.030906861731221036
+          },
+          "tfidf_sgd_huber": {
+            "src": 0.20314991653015127,
+            "mae": 1.8693112580411628,
+            "rmse": 2.3102845891823383,
+            "r2": 0.03671697974741872
+          },
+          "context_catboost": {
+            "src": 0.2940204134533133,
+            "mae": 1.9018248028941798,
+            "rmse": 2.3471717211150303,
+            "r2": 0.005710917008410421
+          },
+          "context_catboost_shallow": {
+            "src": 0.26728133403913656,
+            "mae": 1.8688321574045355,
+            "rmse": 2.336790114110618,
+            "r2": 0.014487003105712493
+          },
+          "text_context_ridge": {
+            "src": 0.3340299884897037,
+            "mae": 1.8218166222056198,
+            "rmse": 2.2567288774392464,
+            "r2": 0.08085989695288065
+          }
+        }
+      },
+      "Holiday&Celebrations": {
+        "rows": 6540,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.34476274322865263,
+            "mae": 1.7239699589104391,
+            "rmse": 2.160417887942756,
+            "r2": 0.10065196196265114
+          },
+          "tfidf_sgd": {
+            "src": 0.4153609057254165,
+            "mae": 1.6324826122302858,
+            "rmse": 2.0624479750763256,
+            "r2": 0.180369205056929
+          },
+          "tfidf_sgd_huber": {
+            "src": 0.31456716277346874,
+            "mae": 1.7934146262003525,
+            "rmse": 2.2933115314908545,
+            "r2": -0.013394101600460617
+          },
+          "context_catboost": {
+            "src": 0.12621387120709193,
+            "mae": 1.881399900742792,
+            "rmse": 2.3725696094681745,
+            "r2": -0.08465141927824926
+          },
+          "context_catboost_shallow": {
+            "src": 0.08979910908228989,
+            "mae": 1.9350622788185325,
+            "rmse": 2.4415549469021225,
+            "r2": -0.14864352158388794
+          },
+          "text_context_ridge": {
+            "src": 0.36432844664914454,
+            "mae": 1.7220327544341218,
+            "rmse": 2.1459263776978936,
+            "r2": 0.11267667322158126
+          }
+        }
+      },
+      "Social&People": {
+        "rows": 4007,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.5047365246549186,
+            "mae": 1.7969829916241604,
+            "rmse": 2.2437767825789123,
+            "r2": 0.24215231866619258
+          },
+          "tfidf_sgd": {
+            "src": 0.47090448869648904,
+            "mae": 1.8960723577281957,
+            "rmse": 2.3139223445365458,
+            "r2": 0.19402756965469048
+          },
+          "tfidf_sgd_huber": {
+            "src": 0.178546420151005,
+            "mae": 2.170723116138499,
+            "rmse": 2.715706859786311,
+            "r2": -0.11016723369918813
+          },
+          "context_catboost": {
+            "src": 0.22027508114185584,
+            "mae": 2.0791318487246264,
+            "rmse": 2.5347377939488993,
+            "r2": 0.03286142170005035
+          },
+          "context_catboost_shallow": {
+            "src": 0.2191471013440369,
+            "mae": 2.0690318944617525,
+            "rmse": 2.5211298824935584,
+            "r2": 0.04321784516791005
+          },
+          "text_context_ridge": {
+            "src": 0.5731787674875983,
+            "mae": 1.7055068779263656,
+            "rmse": 2.1122474037970687,
+            "r2": 0.3283976664639111
+          }
+        }
+      },
+      "Travel&Active&Sports": {
+        "rows": 13182,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.4856963113293537,
+            "mae": 1.5581599722586807,
+            "rmse": 1.9745005825465805,
+            "r2": 0.22192289695552503
+          },
+          "tfidf_sgd": {
+            "src": 0.4140287215049306,
+            "mae": 1.5427446084892957,
+            "rmse": 1.9660853900378565,
+            "r2": 0.22854099147374884
+          },
+          "tfidf_sgd_huber": {
+            "src": 0.24662404395223786,
+            "mae": 1.758539381816927,
+            "rmse": 2.2986276431814896,
+            "r2": -0.054497011456674294
+          },
+          "context_catboost": {
+            "src": 0.18828785996114583,
+            "mae": 1.7710640446746357,
+            "rmse": 2.239223178312189,
+            "r2": -0.0006976147634361052
+          },
+          "context_catboost_shallow": {
+            "src": 0.1794283562440152,
+            "mae": 1.7445927902026437,
+            "rmse": 2.2146927563479832,
+            "r2": 0.02110733735773962
+          },
+          "text_context_ridge": {
+            "src": 0.49348214965171516,
+            "mae": 1.5776957931971112,
+            "rmse": 1.946061928911615,
+            "r2": 0.24417471589806206
+          }
+        }
+      },
+      "Urban": {
+        "rows": 3293,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.47256339674700526,
+            "mae": 1.8510619168117446,
+            "rmse": 2.2645034679601888,
+            "r2": 0.20809805827793448
+          },
+          "tfidf_sgd": {
+            "src": 0.352536322935264,
+            "mae": 1.9396768927324064,
+            "rmse": 2.40090741993769,
+            "r2": 0.10982323323682386
+          },
+          "tfidf_sgd_huber": {
+            "src": 0.04525482693087517,
+            "mae": 2.136398618308501,
+            "rmse": 2.6114361192163984,
+            "r2": -0.05313547153454312
+          },
+          "context_catboost": {
+            "src": 0.39827496445878907,
+            "mae": 1.9283284462351875,
+            "rmse": 2.3444878710759762,
+            "r2": 0.15116865549684
+          },
+          "context_catboost_shallow": {
+            "src": 0.3781548029450995,
+            "mae": 1.953696860119259,
+            "rmse": 2.3727452765744337,
+            "r2": 0.13058393127157553
+          },
+          "text_context_ridge": {
+            "src": 0.5463283799930791,
+            "mae": 1.8205114308012305,
+            "rmse": 2.1847570148631923,
+            "r2": 0.26289100232658347
+          }
+        }
+      },
+      "Whether&Season": {
+        "rows": 5814,
+        "models": {
+          "tfidf_ridge": {
+            "src": 0.4996998955672203,
+            "mae": 1.6980767687677643,
+            "rmse": 2.1553676922322036,
+            "r2": 0.27155427590265957
+          },
+          "tfidf_sgd": {
+            "src": 0.4482815261173601,
+            "mae": 1.8041975842890612,
+            "rmse": 2.2796608358003296,
+            "r2": 0.18511760120594656
+          },
+          "tfidf_sgd_huber": {
+            "src": 0.2037952038973384,
+            "mae": 2.276382494940027,
+            "rmse": 2.8458926912555578,
+            "r2": -0.2699642674839202
+          },
+          "context_catboost": {
+            "src": 0.17188515885822678,
+            "mae": 2.035262781893506,
+            "rmse": 2.508153254813164,
+            "r2": 0.013578340142629708
+          },
+          "context_catboost_shallow": {
+            "src": 0.21259074205689307,
+            "mae": 2.020222461655191,
+            "rmse": 2.489106517739961,
+            "r2": 0.0285030869963665
+          },
+          "text_context_ridge": {
+            "src": 0.5231583507273645,
+            "mae": 1.691818702977201,
+            "rmse": 2.130265152045132,
+            "r2": 0.2884231887184614
+          }
+        }
+      }
+    },
+    "minimum_category_rows": 50,
+    "plots": [
+      "artifacts/diagnostics/combined/holdout-actual-vs-predicted.png",
+      "artifacts/diagnostics/combined/holdout-residuals.png",
+      "artifacts/diagnostics/combined/holdout-mae-by-category.png"
+    ]
+  },
+  "models": {
+    "tfidf_ridge": "artifacts/models/combined/tfidf-ridge.joblib",
+    "tfidf_sgd": "artifacts/models/combined/tfidf-sgd.joblib",
+    "tfidf_sgd_huber": "artifacts/models/combined/tfidf-sgd-huber.joblib",
+    "context_catboost": "artifacts/models/combined/context-catboost.cbm",
+    "context_catboost_shallow": "artifacts/models/combined/context-catboost-shallow.cbm",
+    "text_context_ridge": "artifacts/models/combined/text-context-ridge.joblib"
+  }
+}

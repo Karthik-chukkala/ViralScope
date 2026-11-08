@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ViralScope | Demo</title>
+  <link rel="stylesheet" href="/web/presentation.css?v=20261108-14">
+  <script defer src="/web/image-viewer.js?v=20261110"></script>
+  <script defer src="/web/pages.js"></script>
+</head>
+<body data-page="demo">
+  <header>
+    <a class="brand" href="/"><strong>ViralScope</strong><span>benchmark lab</span></a>
+    <nav class="site-nav" aria-label="Project pages">
+      <a href="/">Dashboard</a><a href="/dataset">Dataset</a><a href="/models">Models</a><a href="/demo" aria-current="page">Demo</a><a href="/solutions">Solutions</a><a href="/references">References</a>
+    </nav>
+    <span class="header-note">Local inference · synthetic inputs</span>
+  </header>
+  <main>
+    <section class="page-head">
+      <div>
+        <h1>Prediction demo</h1>
+        <p class="lede">Try any of the six final models on a synthetic post draft. This estimates the historical SMP popularity label, not current platform reach.</p>
+      </div>
+      <div class="scope">All final models<br><span>fit on 305,613 train labels</span></div>
+    </section>
+    <div class="split">
+      <section>
+        <h2>Draft inputs</h2>
+        <form id="demo-form" class="demo-form">
+          <label>Title<input name="title" maxlength="300" required></label>
+          <label>Tags<textarea name="tags" maxlength="10000" rows="4"></textarea></label>
+          <div class="split">
+            <label>Category<select name="category" required>
+              <option>Animal</option><option>Electronics</option><option>Entertainment</option><option>Family</option><option>Fashion</option><option>Food</option><option>Holiday&amp;Celebrations</option><option>Social&amp;People</option><option>Travel&amp;Active&amp;Sports</option><option>Urban</option><option>Whether&amp;Season</option>
+            </select></label>
+            <label>Subcategory<input name="subcategory"></label>
+          </div>
+          <div class="split">
+            <label>Concept<input name="concept"></label>
+            <label>Planned time (UTC)<input name="planned_at" type="datetime-local" required></label>
+          </div>
+          <label>Model<select id="demo-model" name="model" required></select></label>
+          <div class="actions">
+            <button type="button" class="button-link secondary" id="demo-random">Random example</button>
+            <button type="submit" class="button-link">Estimate score</button>
+          </div>
+        </form>
+        <p class="small">Synthetic examples are not held-out records. No image, account, or live platform data is sent.</p>
+      </section>
+      <section aria-live="polite">
+        <h2>Prediction and explanation</h2>
+        <p id="demo-result" class="stat"></p>
+        <ol id="demo-explanations" class="rule-list"></ol>
+        <p id="demo-error" class="callout" role="alert"></p>
+        <div class="callout">Feature contributions describe model behavior, not causes or guaranteed outcomes. Prediction ranges may fall outside the training-label range; outputs are not clipped.</div>
+      </section>
+    </div>
+  </main>
+  <footer><strong>Powered by SMP Challenge</strong><span>Loopback-only local demo</span></footer>
+</body>
+</html>

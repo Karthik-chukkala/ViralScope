@@ -7,6 +7,7 @@ from viralscope.train_baselines import (
     _holdout_category_metrics,
     build_features,
     build_inference_features,
+    combined_chronological_user_split,
     chronological_split,
     summarize_residuals,
     user_aware_split,
@@ -89,6 +90,31 @@ class TrainBaselineTests(unittest.TestCase):
             user_aware_split(features, labels, np.array(["a", "b"]))
         with self.assertRaises(ValueError):
             user_aware_split(features, labels, np.array(["a", None, "b"], dtype=object))
+
+    def test_combined_split_is_future_ordered_and_purges_holdout_users(self) -> None:
+        features = pd.DataFrame({"value": range(10)})
+        labels = np.arange(10, dtype=np.float64)
+        timestamps = np.arange(10, dtype=np.int64)
+        groups = np.array(["a", "b", "c", "d", "e", "f", "g", "a", "h", "i"])
+
+        train, holdout, cutoff, purged = combined_chronological_user_split(
+            features, labels, timestamps, groups, holdout_fraction=0.3
+        )
+
+        self.assertEqual(cutoff, 7)
+        self.assertTrue((timestamps[train] < cutoff).all())
+        self.assertTrue((timestamps[holdout] >= cutoff).all())
+        self.assertEqual(purged.tolist(), [0])
+        self.assertFalse(set(groups[train]) & set(groups[holdout]))
+
+    def test_combined_split_rejects_invalid_groups(self) -> None:
+        with self.assertRaises(ValueError):
+            combined_chronological_user_split(
+                pd.DataFrame({"value": range(3)}),
+                np.arange(3, dtype=np.float64),
+                np.arange(3, dtype=np.int64),
+                np.array(["a", None, "b"], dtype=object),
+            )
 
     def test_summarize_residuals_reports_signed_bias_and_absolute_error_bands(self) -> None:
         summary = summarize_residuals(

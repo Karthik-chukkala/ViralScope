@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ViralScope | Dataset</title>
+  <link rel="stylesheet" href="/web/presentation.css?v=20261108-14">
+  <script defer src="/web/image-viewer.js?v=20261110"></script>
+  <script defer src="/web/pages.js?v=20261109"></script>
+</head>
+<body data-page="dataset">
+  <header>
+    <a class="brand" href="/"><strong>ViralScope</strong><span>benchmark lab</span></a>
+    <nav class="site-nav" aria-label="Project pages">
+      <a href="/">Dashboard</a><a href="/dataset" aria-current="page">Dataset</a><a href="/models">Models</a><a href="/demo">Demo</a><a href="/solutions">Solutions</a><a href="/references">References</a>
+    </nav>
+    <span class="header-note">SMP-Image · pinned release</span>
+  </header>
+  <main>
+    <section class="page-head">
+      <div>
+        <h1>Dataset audit and analysis</h1>
+        <p class="lede">Full-train statistics use the pinned all-shard projection. Test rows are available for inference only; the public labels are withheld.</p>
+      </div>
+      <div class="scope">Revision<br><span id="revision">Loading...</span></div>
+    </section>
+
+    <section class="stat-grid" aria-label="Dataset key figures">
+      <div class="stat"><strong id="train-rows">--</strong><span>labeled training posts from 49 Parquet shards</span></div>
+      <div class="stat"><strong id="test-rows">--</strong><span>unlabeled test posts from 29 Parquet shards</span></div>
+      <div class="stat"><strong id="label-mean">--</strong><span>full-train mean label · SD <b id="label-sd">--</b></span></div>
+      <div class="stat"><strong id="label-range">--</strong><span>full-train label range</span></div>
+    </section>
+
+    <p data-error class="callout" role="alert"></p>
+    <div class="split">
+      <section>
+        <h2>Target distribution</h2>
+        <figure class="chart">
+          <div id="target-histogram" class="histogram" role="img" aria-label="Full training target label histogram"></div>
+          <div class="small">15 bins · labels read from all 49 training shards</div>
+        </figure>
+        <div class="profile-details">
+          <div>Median label: <strong id="label-median">--</strong></div>
+          <div>Train rows with valid labels: <strong>305,613</strong></div>
+          <div>Missing/non-numeric/non-finite labels: <strong>0</strong></div>
+          <div>HF statistics endpoint: partial (64,551 rows); not used for full-train summaries.</div>
+        </div>
+      </section>
+      <section>
+        <h2>Coverage and missingness</h2>
+        <div class="stat-grid">
+          <div class="stat"><strong id="title-missing">--</strong><span>blank/missing titles</span></div>
+          <div class="stat"><strong id="tag-missing">--</strong><span>blank/missing tag fields</span></div>
+          <div class="stat"><strong id="title-median">--</strong><span>median title length</span></div>
+          <div class="stat"><strong id="tag-median">--</strong><span>median tag length</span></div>
+        </div>
+        <p class="small">Post dates span <b id="date-range">--</b>. Timestamps were parsed as Unix seconds and converted to UTC.</p>
+        <p class="small">License: <strong id="license-name">SMP Challenge Community License</strong>. The working caches exclude images, IDs, profile fields, and coordinates.</p>
+      </section>
+    </div>
+
+    <section class="section">
+      <h2>Full-train temporal, category, and text profile</h2>
+      <p class="section-intro">All-shard aggregate analysis; no raw post text or user identifiers are shown.</p>
+      <figure class="chart"><img src="/api/diagnostics/full-train-temporal-text.png" alt="Monthly post counts, category counts, title character lengths, and tag token lengths across all training rows."><figcaption class="small">Monthly counts and text-length distributions computed across all 305,613 training rows.</figcaption></figure>
+    </section>
+
+    <section class="section">
+      <h2>Seven-shard sample profile</h2>
+      <figure class="chart"><img src="/api/diagnostics/sample-temporal-text.png" alt="Sample-only charts of posts per month and distributions of title character length and tag token count."><figcaption id="sample-eda-caption" class="small">Sample-only temporal and text coverage; these distributions are not full-train estimates.</figcaption></figure>
+    </section>
+
+    <section class="section">
+      <h2>Categories</h2>
+      <div class="split">
+        <div id="category-bars" class="rule-list" aria-label="Full-train category frequency chart"></div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Category</th><th>Rows</th><th>Share</th></tr></thead><tbody id="category-summary"></tbody></table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Unlabeled test input coverage</h2>
+      <p class="section-intro">All 29 public test shards. Only input fields were read; target labels, IDs, images, profile data, and coordinates were not cached.</p>
+      <div class="stat-grid">
+        <div class="stat"><strong id="test-input-rows">--</strong><span>test input rows</span></div>
+        <div class="stat"><strong id="test-title-missing">--</strong><span>blank/missing titles</span></div>
+        <div class="stat"><strong id="test-tag-missing">--</strong><span>blank/missing tag fields</span></div>
+        <div class="stat"><strong id="test-date-range">--</strong><span>test post date range</span></div>
+      </div>
+      <figure class="chart"><img src="/api/diagnostics/test-input-coverage.png" alt="Test-split monthly post counts, category distribution, title lengths, and tag lengths."><figcaption id="test-input-caption" class="small">Loading test input analysis...</figcaption></figure>
+      <div class="table-wrap">
+        <table><thead><tr><th>Test category</th><th>Rows</th><th>Share</th></tr></thead><tbody id="test-category-summary"></tbody></table>
+      </div>
+      <div class="callout"><strong>Evaluation note:</strong> these inputs are used to produce predictions only. Public test targets are withheld, so no test MAE, SRC, RMSE, R², accuracy, or F1 is available.</div>
+    </section>
+
+    <section class="section">
+      <h2>Dataset fields and handling</h2>
+      <p class="section-intro">Source feature schema and whether each field enters the current non-image pipeline.</p>
+      <div class="table-wrap">
+        <table><thead><tr><th>Field</th><th>Declared type</th><th>Project handling</th></tr></thead><tbody id="field-schema"></tbody></table>
+      </div>
+      <div class="callout"><strong>Prediction-time boundary:</strong> train features are title, tags, category, subcategory, concept, and planned-time encodings. IDs, profile snapshots, post-publication engagement, coordinates, and image content are not model inputs.</div>
+    </section>
+
+    <section class="section">
+      <h2>Public test split: inference only</h2>
+      <p id="test-inference-note" class="callout">The split's labels are withheld. Do not treat prediction distributions as test accuracy or error.</p>
+      <div class="small" id="test-inference-count"></div>
+      <div class="table-wrap">
+        <table><thead><tr><th>Model</th><th>Rows</th><th>Min</th><th>P10</th><th>Median</th><th>Mean</th><th>P90</th><th>Max</th><th>Outside train label range</th></tr></thead><tbody id="test-predictions"></tbody></table>
+      </div>
+    </section>
+    <p class="small" data-error></p>
+  </main>
+  <footer><strong>Powered by SMP Challenge</strong><span>Full train statistics · unlabeled test inference</span></footer>
+</body>
+</html>

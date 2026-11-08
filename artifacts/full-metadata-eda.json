@@ -1,0 +1,622 @@
+{
+  "generated_at_utc": "2026-11-08T13:44:05.278339+00:00",
+  "dataset": {
+    "repository": "smpchallenge/SMP-Image",
+    "revision": "f131dba653a05c0e3c6294388f81ed3fbd9c71a0",
+    "split": "train",
+    "expected_rows": 305613
+  },
+  "scan": {
+    "rows_scanned": 305613,
+    "shards_scanned": 49,
+    "shards_available": 49,
+    "sampled": false,
+    "shard_selection": "all",
+    "shard_names": [
+      "data/train-00000.parquet",
+      "data/train-00001.parquet",
+      "data/train-00002.parquet",
+      "data/train-00003.parquet",
+      "data/train-00004.parquet",
+      "data/train-00005.parquet",
+      "data/train-00006.parquet",
+      "data/train-00007.parquet",
+      "data/train-00008.parquet",
+      "data/train-00009.parquet",
+      "data/train-00010.parquet",
+      "data/train-00011.parquet",
+      "data/train-00012.parquet",
+      "data/train-00013.parquet",
+      "data/train-00014.parquet",
+      "data/train-00015.parquet",
+      "data/train-00016.parquet",
+      "data/train-00017.parquet",
+      "data/train-00018.parquet",
+      "data/train-00019.parquet",
+      "data/train-00020.parquet",
+      "data/train-00021.parquet",
+      "data/train-00022.parquet",
+      "data/train-00023.parquet",
+      "data/train-00024.parquet",
+      "data/train-00025.parquet",
+      "data/train-00026.parquet",
+      "data/train-00027.parquet",
+      "data/train-00028.parquet",
+      "data/train-00029.parquet",
+      "data/train-00030.parquet",
+      "data/train-00031.parquet",
+      "data/train-00032.parquet",
+      "data/train-00033.parquet",
+      "data/train-00034.parquet",
+      "data/train-00035.parquet",
+      "data/train-00036.parquet",
+      "data/train-00037.parquet",
+      "data/train-00038.parquet",
+      "data/train-00039.parquet",
+      "data/train-00040.parquet",
+      "data/train-00041.parquet",
+      "data/train-00042.parquet",
+      "data/train-00043.parquet",
+      "data/train-00044.parquet",
+      "data/train-00045.parquet",
+      "data/train-00046.parquet",
+      "data/train-00047.parquet",
+      "data/train-00048.parquet"
+    ],
+    "row_groups_scanned": 3080,
+    "columns_read": [
+      "Uid",
+      "Pid",
+      "Postdate",
+      "Category",
+      "Subcategory",
+      "Concept",
+      "Title",
+      "Alltags"
+    ],
+    "image_bytes_read": false
+  },
+  "eda": {
+    "rows_scanned": 305613,
+    "missing_counts": {
+      "Uid": 0,
+      "Pid": 0,
+      "Postdate": 0,
+      "Category": 0,
+      "Subcategory": 0,
+      "Concept": 0,
+      "Title": 10553,
+      "Alltags": 3
+    },
+    "unique_users": 38312,
+    "unique_post_ids": 305613,
+    "duplicate_post_id_rows": 0,
+    "invalid_timestamp_count": 0,
+    "category_frequencies": [
+      {
+        "value": "Travel&Active&Sports",
+        "count": 66469
+      },
+      {
+        "value": "Holiday&Celebrations",
+        "count": 54751
+      },
+      {
+        "value": "Fashion",
+        "count": 49282
+      },
+      {
+        "value": "Entertainment",
+        "count": 29590
+      },
+      {
+        "value": "Social&People",
+        "count": 23351
+      },
+      {
+        "value": "Whether&Season",
+        "count": 20292
+      },
+      {
+        "value": "Animal",
+        "count": 19992
+      },
+      {
+        "value": "Food",
+        "count": 16727
+      },
+      {
+        "value": "Urban",
+        "count": 15272
+      },
+      {
+        "value": "Electronics",
+        "count": 5613
+      },
+      {
+        "value": "Family",
+        "count": 4274
+      }
+    ],
+    "subcategory_frequencies": [
+      {
+        "value": "Halloween",
+        "count": 16390
+      },
+      {
+        "value": "Makeup",
+        "count": 12018
+      },
+      {
+        "value": "Books",
+        "count": 11105
+      },
+      {
+        "value": "Music",
+        "count": 10506
+      },
+      {
+        "value": "Christmas",
+        "count": 10345
+      },
+      {
+        "value": "Wedding",
+        "count": 8753
+      },
+      {
+        "value": "Cars",
+        "count": 8340
+      },
+      {
+        "value": "Good,Morning",
+        "count": 8051
+      },
+      {
+        "value": "StreetArt",
+        "count": 7717
+      },
+      {
+        "value": "Architecture",
+        "count": 7555
+      },
+      {
+        "value": "Hair",
+        "count": 7303
+      },
+      {
+        "value": "Tattoos",
+        "count": 7162
+      },
+      {
+        "value": "Fish",
+        "count": 6850
+      },
+      {
+        "value": "New",
+        "count": 6771
+      },
+      {
+        "value": "Dessert",
+        "count": 6323
+      },
+      {
+        "value": "Thanksgiving",
+        "count": 6264
+      },
+      {
+        "value": "Movies",
+        "count": 6138
+      },
+      {
+        "value": "Drinks",
+        "count": 6107
+      },
+      {
+        "value": "Bodybuilding",
+        "count": 5912
+      },
+      {
+        "value": "Skateboarding",
+        "count": 5811
+      },
+      {
+        "value": "Good",
+        "count": 5654
+      },
+      {
+        "value": "Electronics",
+        "count": 5613
+      },
+      {
+        "value": "Jewelry",
+        "count": 5511
+      },
+      {
+        "value": "Sunny",
+        "count": 5489
+      },
+      {
+        "value": "Nails",
+        "count": 5303
+      },
+      {
+        "value": "Travel",
+        "count": 4913
+      },
+      {
+        "value": "Party",
+        "count": 4849
+      },
+      {
+        "value": "Horses",
+        "count": 4846
+      },
+      {
+        "value": "Hockey",
+        "count": 4725
+      },
+      {
+        "value": "Raining",
+        "count": 4506
+      },
+      {
+        "value": "Football",
+        "count": 4477
+      },
+      {
+        "value": "Gymnastics",
+        "count": 4451
+      },
+      {
+        "value": "Cheerleading",
+        "count": 4263
+      },
+      {
+        "value": "Babies",
+        "count": 4031
+      },
+      {
+        "value": "Motorcycles",
+        "count": 3860
+      },
+      {
+        "value": "Love",
+        "count": 3788
+      },
+      {
+        "value": "Piercings",
+        "count": 3383
+      },
+      {
+        "value": "Dance",
+        "count": 3375
+      },
+      {
+        "value": "Insects",
+        "count": 3301
+      },
+      {
+        "value": "Friends",
+        "count": 3166
+      },
+      {
+        "value": "Snowing",
+        "count": 3122
+      },
+      {
+        "value": "Tea",
+        "count": 2691
+      },
+      {
+        "value": "Winter",
+        "count": 2575
+      },
+      {
+        "value": "Dogs",
+        "count": 2538
+      },
+      {
+        "value": "Cats",
+        "count": 2457
+      },
+      {
+        "value": "Baltimore",
+        "count": 2445
+      },
+      {
+        "value": "Baseball",
+        "count": 2403
+      },
+      {
+        "value": "Soccer",
+        "count": 2320
+      },
+      {
+        "value": "Sneakers",
+        "count": 2270
+      },
+      {
+        "value": "San",
+        "count": 2263
+      },
+      {
+        "value": "OOTD",
+        "count": 2181
+      },
+      {
+        "value": "Cloudy",
+        "count": 2037
+      },
+      {
+        "value": "Selfies",
+        "count": 1957
+      },
+      {
+        "value": "Health,Fitness",
+        "count": 1874
+      },
+      {
+        "value": "Video&Games",
+        "count": 1841
+      },
+      {
+        "value": "Guys,Fashion",
+        "count": 1704
+      },
+      {
+        "value": "Denver",
+        "count": 1659
+      },
+      {
+        "value": "Coffee",
+        "count": 1510
+      },
+      {
+        "value": "Birthday",
+        "count": 1335
+      },
+      {
+        "value": "Summer",
+        "count": 1172
+      },
+      {
+        "value": "Running",
+        "count": 1025
+      },
+      {
+        "value": "Basketball",
+        "count": 966
+      },
+      {
+        "value": "Fall",
+        "count": 884
+      },
+      {
+        "value": "Fashion",
+        "count": 879
+      },
+      {
+        "value": "Earrings",
+        "count": 776
+      },
+      {
+        "value": "Seattle",
+        "count": 721
+      },
+      {
+        "value": "Sports",
+        "count": 651
+      },
+      {
+        "value": "Guys",
+        "count": 636
+      },
+      {
+        "value": "Spring",
+        "count": 507
+      },
+      {
+        "value": "Bracelets",
+        "count": 485
+      },
+      {
+        "value": "Kids",
+        "count": 243
+      },
+      {
+        "value": "Girls,Fashion",
+        "count": 161
+      },
+      {
+        "value": "High,Heels",
+        "count": 146
+      },
+      {
+        "value": "Girls",
+        "count": 99
+      },
+      {
+        "value": "General",
+        "count": 96
+      },
+      {
+        "value": "Holidays",
+        "count": 44
+      },
+      {
+        "value": "Super",
+        "count": 15
+      }
+    ],
+    "top_20_concepts": [
+      {
+        "value": "pumpkinpatch",
+        "count": 1874
+      },
+      {
+        "value": "happynewyear",
+        "count": 1815
+      },
+      {
+        "value": "hauntedhouse",
+        "count": 1812
+      },
+      {
+        "value": "quarterback",
+        "count": 1763
+      },
+      {
+        "value": "newyearseve",
+        "count": 1759
+      },
+      {
+        "value": "merrychristmas",
+        "count": 1745
+      },
+      {
+        "value": "chilly",
+        "count": 1739
+      },
+      {
+        "value": "trickortreat",
+        "count": 1726
+      },
+      {
+        "value": "tar",
+        "count": 1694
+      },
+      {
+        "value": "carols",
+        "count": 1663
+      },
+      {
+        "value": "wakeup",
+        "count": 1658
+      },
+      {
+        "value": "nook",
+        "count": 1641
+      },
+      {
+        "value": "tat",
+        "count": 1635
+      },
+      {
+        "value": "jackolantern",
+        "count": 1602
+      },
+      {
+        "value": "haircolor",
+        "count": 1598
+      },
+      {
+        "value": "moviestar",
+        "count": 1596
+      },
+      {
+        "value": "knockout",
+        "count": 1592
+      },
+      {
+        "value": "navel",
+        "count": 1582
+      },
+      {
+        "value": "jolly",
+        "count": 1577
+      },
+      {
+        "value": "dubstep",
+        "count": 1553
+      }
+    ],
+    "monthly_post_counts_utc": [
+      {
+        "month": "2015-02",
+        "count": 32
+      },
+      {
+        "month": "2015-03",
+        "count": 10521
+      },
+      {
+        "month": "2015-04",
+        "count": 8655
+      },
+      {
+        "month": "2015-05",
+        "count": 17661
+      },
+      {
+        "month": "2015-06",
+        "count": 16660
+      },
+      {
+        "month": "2015-07",
+        "count": 20299
+      },
+      {
+        "month": "2015-08",
+        "count": 19681
+      },
+      {
+        "month": "2015-09",
+        "count": 24999
+      },
+      {
+        "month": "2015-10",
+        "count": 37087
+      },
+      {
+        "month": "2015-11",
+        "count": 27857
+      },
+      {
+        "month": "2015-12",
+        "count": 39714
+      },
+      {
+        "month": "2016-01",
+        "count": 37776
+      },
+      {
+        "month": "2016-02",
+        "count": 44671
+      }
+    ],
+    "title_length_characters": {
+      "count": 295060,
+      "min": 1,
+      "median": 19.0,
+      "mean": 28.66259404866807,
+      "max": 263
+    },
+    "title_word_counts": {
+      "count": 295060,
+      "min": 1,
+      "median": 3.0,
+      "mean": 4.2139700399918665,
+      "max": 56
+    },
+    "tag_field_length_characters": {
+      "count": 305610,
+      "min": 3,
+      "median": 131.0,
+      "mean": 183.0861850070351,
+      "max": 1680
+    },
+    "tag_field_token_counts": {
+      "count": 305610,
+      "min": 1,
+      "median": 16.0,
+      "mean": 21.066604495926182,
+      "max": 75
+    },
+    "privacy": {
+      "raw_text_written": false,
+      "raw_user_ids_written": false,
+      "coordinates_read": false,
+      "image_bytes_read": false
+    }
+  }
+}

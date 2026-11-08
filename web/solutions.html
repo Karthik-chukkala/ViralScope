@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ViralScope | Solutions and Progress</title>
+  <link rel="stylesheet" href="/web/presentation.css?v=20261108-14">
+  <script defer src="/web/image-viewer.js?v=20261110"></script>
+</head>
+<body data-page="solutions">
+  <header>
+    <a class="brand" href="/"><strong>ViralScope</strong><span>benchmark lab</span></a>
+    <nav class="site-nav" aria-label="Project pages">
+      <a href="/">Dashboard</a><a href="/dataset">Dataset</a><a href="/models">Models</a><a href="/demo">Demo</a><a href="/solutions" aria-current="page">Solutions</a><a href="/references">References</a>
+    </nav>
+    <span class="header-note">Build record · current state</span>
+  </header>
+  <main>
+    <section class="page-head">
+      <div>
+        <h1>Solutions and progress</h1>
+        <p class="lede">What was built, why the scope changed, how the pipeline is organized, and what remains before a defensible final review.</p>
+      </div>
+      <div class="scope">Current milestone<br><span>full train · 6 models · full test inference</span></div>
+    </section>
+
+    <section class="section">
+      <h2>High-level pipeline</h2>
+      <div class="flow" role="img" aria-label="Dataset revision to full-train cache, EDA, evaluation, final fitting, and test inference">
+        <div class="flow-step"><b>1. Pin + audit</b><p>Verify repository revision, split sizes, license, labels, and withheld test-label status.</p></div>
+        <div class="flow-step"><b>2. Project columns</b><p>Read text, categories, Unix time, and train labels from all train shards. Skip images, IDs, profiles, and locations.</p></div>
+        <div class="flow-step"><b>3. Analyze + compare</b><p>Full-train EDA; chronological, user-disjoint, combined future-time/unseen-user, and nested temporal evaluations.</p></div>
+        <div class="flow-step"><b>4. Fit + infer</b><p>Refit six variants on all labeled train rows, then predict every unlabeled test row without scoring it.</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Work completed and decisions</h2>
+      <div class="solution-list">
+        <article class="solution-item"><h3>Dataset access</h3><p>Pinned the SMP-Image revision, confirmed 305,613 labeled train rows, and treated sampled -1 test labels as withheld rather than scoreable.</p></article>
+        <article class="solution-item"><h3>Remote-read bottleneck</h3><p>Replaced serial full scans for early EDA with bounded concurrent column projection. The full-train cache uses all 49 train shards but excludes image bytes and profile/location fields.</p></article>
+        <article class="solution-item"><h3>Leakage-aware evaluation</h3><p>Added chronological, user-disjoint, and multi-cutoff sensitivity reports. User IDs are used only transiently to make disjoint groups and are never model features or saved.</p></article>
+        <article class="solution-item"><h3>Combined future-time + unseen-user test</h3><p>Evaluated 61,123 future posts from 11,792 users with zero train/holdout user overlap. Purged 66,886 earlier rows from holdout users before fitting. No holdout-based tuning was performed.</p></article>
+        <article class="solution-item"><h3>Full-train quality audit</h3><p>Checked all 305,613 cached rows for schema, missing values, numeric/date validity, ranges, exact duplicates, repeated inputs, and conflicting labels. Results are aggregate-only; no raw text or IDs are included in the report.</p></article>
+        <article class="solution-item"><h3>Explanation verification</h3><p>Added checks for additive contribution fidelity, repeatability, and stability under whitespace-only formatting changes. The audit does not claim semantic robustness or causal explanations.</p></article>
+        <article class="solution-item"><h3>Scope and limits</h3><p>Image modeling remains deferred. All 29 test shards have inference predictions, but labels are withheld so test accuracy is unavailable. The full license is included; public image display and deployment still need AUP/supervisor review.</p></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Problems solved so far</h2>
+      <div class="solution-list">
+        <article class="solution-item"><h3>Remote metadata scan stalled</h3><p>Latency dominated small column reads. A deterministic seven-shard path enabled smoke EDA; the final cache now projects seven safe columns from all 49 train shards with bounded concurrency.</p></article>
+        <article class="solution-item"><h3>Images were too costly for Part 1</h3><p>Image bytes are not needed for the current text/context model ladder, so the 25.66 GB image-bearing train split was not downloaded.</p></article>
+        <article class="solution-item"><h3>Test labels are withheld</h3><p>Sampled test labels were -1. All 29 test shards were cached without labels and passed through six final models; the site reports distributions, not accuracy or error.</p></article>
+        <article class="solution-item"><h3>One split can mislead</h3><p>Added a future-time holdout, an independent user-disjoint holdout, three nested time cutoffs, and a combined future-time/unseen-user holdout with zero overlap.</p></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Detailed design and implementation</h2>
+      <div class="split">
+        <div class="rule-list">
+          <div class="rule"><b>Feature boundary</b><p>Model inputs are title, tags, category, subcategory, concept, and cyclic planned-time features. User IDs are used only transiently to group the user-disjoint split.</p></div>
+          <div class="rule"><b>Training protocol</b><p>Compare six models with identical feature/split definitions. Keep validation/holdout metrics separate from final models refit on all train rows.</p></div>
+          <div class="rule"><b>Evaluation output</b><p>SRC, MAE, RMSE, R², residual summaries, category slices, fit plots, and temporal sensitivity. Accuracy/F1 are not used for continuous regression.</p></div>
+        </div>
+        <div class="rule-list">
+          <div class="rule"><b>High-level design</b><p>FastAPI loads precomputed model artifacts and aggregate reports once for local review. Static page routes keep Dataset, Model, Demo, Solutions, and References views separate.</p></div>
+          <div class="rule"><b>Low-level design</b><p>Hugging Face range reader → projected Parquet cache → feature builder → shared model suite → holdout reports/plots → final model refit → label-free test inference parquet.</p></div>
+          <div class="rule"><b>Privacy controls</b><p>Full caches omit Uid/Pid, coordinates, profiles, and images. User IDs for group splitting remain in memory; no IDs are written to reports.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Decisions and future work</h2>
+      <div class="solution-list">
+        <article class="solution-item"><h3>Current model leader</h3><p>Text + context Ridge leads the chronological full-train holdout: SRC 0.634, MAE 1.490. Huber SGD is retained as a comparison but is currently weak.</p></article>
+        <article class="solution-item"><h3>Next evaluation</h3><p>The combined future-time/unseen-user holdout is complete. If additional tuning is planned, create a separate validation split; never tune on the combined holdout or public test set.</p></article>
+        <article class="solution-item"><h3>Next EDA</h3><p>Full-train schema, range, missingness, duplicate-input, and label-conflict checks are recorded. Image-quality statistics remain deferred until image-use approval.</p></article>
+        <article class="solution-item"><h3>Release gate</h3><p>Review the complete SMP license and incorporated AUP with the supervisor before public deployment or additional redistribution. The test split is not scoreable.</p></article>
+      </div>
+    </section>
+    <div class="actions"><a class="button-link" href="/models">Review models</a><a class="button-link secondary" href="/references">Open references</a></div>
+  </main>
+  <footer><strong>Powered by SMP Challenge</strong><span>ViralScope work record</span></footer>
+</body>
+</html>

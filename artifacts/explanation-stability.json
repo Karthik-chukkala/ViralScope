@@ -1,0 +1,114 @@
+{
+  "generated_at_utc": "2026-11-08T13:45:26.905875+00:00",
+  "dataset": {
+    "repository": "smpchallenge/SMP-Image",
+    "revision": "f131dba653a05c0e3c6294388f81ed3fbd9c71a0",
+    "rows": 305613,
+    "sample_method": "all_train_shards"
+  },
+  "sample": {
+    "rows_checked_per_model": 128,
+    "selection": "evenly spaced rows from the chronological 20% tail",
+    "raw_inputs_written": false
+  },
+  "method": {
+    "additivity": "base value plus all feature contributions must equal prediction",
+    "repeatability": "same final model and input evaluated twice",
+    "perturbation": "whitespace-only formatting change preserving text tokens",
+    "top_features": 6,
+    "absolute_tolerance": 1e-08,
+    "does_not_test": [
+      "semantic paraphrase robustness",
+      "causal validity of feature contributions",
+      "generalization performance"
+    ]
+  },
+  "models": {
+    "tfidf_ridge": {
+      "display_name": "TF-IDF + Ridge",
+      "rows_checked": 128,
+      "deterministic_explanation_rows": 128,
+      "max_additive_reconstruction_error": 4.440892098500626e-15,
+      "formatting_only": {
+        "max_abs_prediction_delta": 0.0,
+        "mean_top_6_feature_jaccard": 1.0,
+        "mean_shared_feature_sign_agreement": 1.0,
+        "minimum_top_6_feature_jaccard": 1.0,
+        "minimum_shared_feature_sign_agreement": 1.0
+      },
+      "checks_passed": true
+    },
+    "tfidf_sgd": {
+      "display_name": "TF-IDF + SGD",
+      "rows_checked": 128,
+      "deterministic_explanation_rows": 128,
+      "max_additive_reconstruction_error": 1.7763568394002505e-15,
+      "formatting_only": {
+        "max_abs_prediction_delta": 0.0,
+        "mean_top_6_feature_jaccard": 1.0,
+        "mean_shared_feature_sign_agreement": 1.0,
+        "minimum_top_6_feature_jaccard": 1.0,
+        "minimum_shared_feature_sign_agreement": 1.0
+      },
+      "checks_passed": true
+    },
+    "tfidf_sgd_huber": {
+      "display_name": "TF-IDF + Huber SGD",
+      "rows_checked": 128,
+      "deterministic_explanation_rows": 128,
+      "max_additive_reconstruction_error": 1.5543122344752192e-15,
+      "formatting_only": {
+        "max_abs_prediction_delta": 0.0,
+        "mean_top_6_feature_jaccard": 1.0,
+        "mean_shared_feature_sign_agreement": 1.0,
+        "minimum_top_6_feature_jaccard": 1.0,
+        "minimum_shared_feature_sign_agreement": 1.0
+      },
+      "checks_passed": true
+    },
+    "context_catboost": {
+      "display_name": "Context CatBoost",
+      "rows_checked": 128,
+      "deterministic_explanation_rows": 128,
+      "max_additive_reconstruction_error": 6.217248937900877e-15,
+      "formatting_only": {
+        "max_abs_prediction_delta": 0.0,
+        "mean_top_6_feature_jaccard": 1.0,
+        "mean_shared_feature_sign_agreement": 1.0,
+        "minimum_top_6_feature_jaccard": 1.0,
+        "minimum_shared_feature_sign_agreement": 1.0
+      },
+      "checks_passed": true
+    },
+    "context_catboost_shallow": {
+      "display_name": "Context CatBoost (shallow)",
+      "rows_checked": 128,
+      "deterministic_explanation_rows": 128,
+      "max_additive_reconstruction_error": 7.105427357601002e-15,
+      "formatting_only": {
+        "max_abs_prediction_delta": 0.0,
+        "mean_top_6_feature_jaccard": 1.0,
+        "mean_shared_feature_sign_agreement": 1.0,
+        "minimum_top_6_feature_jaccard": 1.0,
+        "minimum_shared_feature_sign_agreement": 1.0
+      },
+      "checks_passed": true
+    },
+    "text_context_ridge": {
+      "display_name": "Text + context Ridge",
+      "rows_checked": 128,
+      "deterministic_explanation_rows": 128,
+      "max_additive_reconstruction_error": 3.9968028886505635e-15,
+      "formatting_only": {
+        "max_abs_prediction_delta": 0.0,
+        "mean_top_6_feature_jaccard": 1.0,
+        "mean_shared_feature_sign_agreement": 1.0,
+        "minimum_top_6_feature_jaccard": 1.0,
+        "minimum_shared_feature_sign_agreement": 1.0
+      },
+      "checks_passed": true
+    }
+  },
+  "all_checks_passed": true,
+  "official_test_scored": false
+}

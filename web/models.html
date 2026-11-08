@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ViralScope | Models</title>
+  <link rel="stylesheet" href="/web/presentation.css?v=20261108-14">
+  <script defer src="/web/image-viewer.js?v=20261110"></script>
+  <script defer src="/web/pages.js?v=20261109"></script>
+</head>
+<body data-page="models">
+  <header>
+    <a class="brand" href="/"><strong>ViralScope</strong><span>benchmark lab</span></a>
+    <nav class="site-nav" aria-label="Project pages">
+      <a href="/">Dashboard</a><a href="/dataset">Dataset</a><a href="/models" aria-current="page">Models</a><a href="/demo">Demo</a><a href="/solutions">Solutions</a><a href="/references">References</a>
+    </nav>
+    <span class="header-note">Six learned variants</span>
+  </header>
+  <main>
+    <section class="page-head">
+      <div>
+        <h1>Model laboratory</h1>
+        <p class="lede">Six learned variants plus a median baseline, all evaluated on identical full-train splits. Open a model for its inputs, training recipe, and results.</p>
+      </div>
+      <div class="scope">Final fit<br><span id="fit-rows">305,613</span> train rows</div>
+    </section>
+    <div class="callout"><strong>Comparison protocol:</strong> train/chronological holdout is a row-ordered 80/20 split; user-disjoint holdout groups users and has zero overlap. All numbers are local holdout metrics, not official test metrics. The public test split is inference-only.</div>
+
+    <section class="section">
+      <h2>Six model variants</h2>
+      <div id="model-cards" class="model-list"></div>
+    </section>
+
+    <section class="section" aria-labelledby="chronological-title">
+      <h2 id="chronological-title">Chronological holdout</h2>
+      <p id="chronological-count" class="section-intro">Loading evaluation...</p>
+      <div id="chronological-bars" class="metric-grid"></div>
+      <div class="table-wrap">
+        <table><thead><tr><th>Model</th><th>Train rows</th><th>Holdout rows</th><th>Train SRC</th><th>Train MAE</th><th>Holdout SRC</th><th>Holdout MAE</th><th>Holdout RMSE</th><th>Holdout R²</th></tr></thead><tbody id="chronological-table"></tbody></table>
+      </div>
+      <p class="small">This chronological holdout is from the labeled train split, not the public test set. Feature contributions describe model behavior, not causes.</p>
+    </section>
+
+    <section class="section" id="user-aware-results" hidden>
+      <h2>Unseen-user holdout</h2>
+      <p id="user-aware-count" class="section-intro"></p>
+      <div id="user-aware-bars" class="metric-grid"></div>
+      <p class="small">Users are held out as groups and are not model features. This random group split tests unseen-user generalization, not future-time generalization.</p>
+    </section>
+
+    <section class="section" id="combined-results" hidden>
+      <h2>Future-time + unseen-user holdout</h2>
+      <p id="combined-count" class="section-intro"></p>
+      <div id="combined-bars" class="metric-grid"></div>
+      <div class="table-wrap">
+        <table><thead><tr><th>Model</th><th>Train SRC</th><th>Train MAE</th><th>Holdout SRC</th><th>Holdout MAE</th><th>Holdout RMSE</th><th>Holdout R²</th></tr></thead><tbody id="combined-table"></tbody></table>
+      </div>
+      <p class="small">The holdout contains only posts at or after the chronological cutoff. Earlier posts from any user in that holdout are purged from training. Scores are local validation results, not public-test metrics.</p>
+    </section>
+
+    <section class="section" id="temporal-sensitivity" hidden>
+      <h2>Temporal cutoff sensitivity</h2>
+      <p class="section-intro">Nested chronological tail holdouts from the full labeled train split.</p>
+      <div class="table-wrap">
+        <table><thead><tr><th>Holdout</th><th>Cutoff</th><th>SRC leader</th><th>MAE leader</th></tr></thead><tbody id="temporal-runs"></tbody></table>
+      </div>
+      <p class="small">These windows overlap and are sensitivity checks, not independent test sets.</p>
+    </section>
+
+    <section class="section">
+      <h2>Holdout error diagnostics</h2>
+      <p id="diagnostic-count" class="section-intro">Full-train chronological holdout diagnostics.</p>
+      <div class="charts">
+        <figure class="chart"><h3>Actual vs. predicted popularity</h3><img src="/api/diagnostics/holdout-actual-vs-predicted.png" alt="Actual versus predicted popularity labels for three models; the diagonal indicates perfect prediction."><figcaption>Predicted versus actual labels. Values cluster toward the center, especially for the context model.</figcaption></figure>
+        <figure class="chart"><h3>Prediction error distributions</h3><img src="/api/diagnostics/holdout-residuals.png" alt="Prediction error distributions for the text, context, and combined models, centered on zero error."><figcaption>Prediction error is predicted minus actual; positive values indicate overprediction.</figcaption></figure>
+        <figure class="chart"><h3>Error by category</h3><img src="/api/diagnostics/holdout-mae-by-category.png" alt="Mean absolute error by category for the three baseline models, including groups with at least 50 holdout posts."><figcaption>Category MAE slices include categories with at least 50 holdout posts. Smaller groups are omitted.</figcaption></figure>
+      </div>
+      <p class="small">These diagnostics describe the chronological holdout from the labeled training split. Public test labels are withheld.</p>
+    </section>
+
+    <section class="section">
+      <h2>How to read the metrics</h2>
+      <div class="split">
+        <div class="rule-list">
+          <div class="rule"><b>SRC / Spearman rho</b><p>Rank agreement between predicted and observed popularity. Higher is better.</p></div>
+          <div class="rule"><b>MAE</b><p>Average absolute error in label units. Lower is better and this is one of the challenge metrics.</p></div>
+          <div class="rule"><b>RMSE</b><p>Square-root mean squared error; larger misses receive more weight.</p></div>
+          <div class="rule"><b>R²</b><p>Variance explained relative to a mean predictor. It can be negative and is not classification accuracy.</p></div>
+        </div>
+        <div class="rule-list">
+          <div class="rule"><b>Why six variants?</b><p>They compare sparse-text linear fitting, loss functions, structured nonlinear models with different capacity, and text/context fusion. This is a controlled project ladder, not a verbatim reproduction of six challenge teams.</p></div>
+          <div class="rule"><b>Why no accuracy or F1?</b><p>The target is continuous regression. Accuracy/F1 require a defined classification label and threshold; no such secondary task is claimed.</p></div>
+          <div class="rule"><b>Why no test metrics?</b><p>Test labels are withheld as -1. We generate predictions for all test rows but do not compare them to placeholders.</p></div>
+        </div>
+      </div>
+    </section>
+    <p data-error class="callout" role="alert"></p>
+  </main>
+  <footer><strong>Powered by SMP Challenge</strong><span>All-train final fits · local holdouts for evaluation</span></footer>
+</body>
+</html>

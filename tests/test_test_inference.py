@@ -1,11 +1,31 @@
 import unittest
 
 import numpy as np
+import pandas as pd
 
-from viralscope.test_inference import summarize_predictions
+from viralscope.test_inference import summarize_predictions, summarize_unlabeled_inputs
 
 
 class TestInferenceTests(unittest.TestCase):
+    def test_summarize_unlabeled_test_inputs_excludes_targets_and_ids(self) -> None:
+        frame = pd.DataFrame(
+            {
+                "Postdate": ["1451606400", "1454284800"],
+                "Category": ["Food", "Urban"],
+                "Title": ["Berry tart", ""],
+                "Alltags": ["fresh sweet", "city lights"],
+            }
+        )
+
+        summary = summarize_unlabeled_inputs(frame)
+
+        self.assertEqual(summary["rows"], 2)
+        self.assertEqual(summary["missing_or_blank"]["Title"], 1)
+        self.assertEqual(len(summary["monthly_posts_utc"]), 2)
+        self.assertEqual(summary["category_frequencies"][0], {"category": "Food", "count": 1})
+        self.assertFalse(summary["labels_read"])
+        self.assertFalse(summary["ids_read"])
+
     def test_summarize_predictions_reports_distribution_without_targets(self) -> None:
         summary = summarize_predictions(np.array([1.0, 2.0, 3.0, 4.0]))
 

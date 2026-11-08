@@ -158,6 +158,35 @@ def user_aware_split(
     return train_indexes, holdout_indexes
 
 
+def combined_chronological_user_split(
+    features: pd.DataFrame,
+    labels: np.ndarray,
+    timestamps: np.ndarray,
+    groups: np.ndarray,
+    holdout_fraction: float = 0.2,
+) -> tuple[np.ndarray, np.ndarray, int, np.ndarray]:
+    group_values = np.asarray(groups)
+    if group_values.ndim != 1 or len(group_values) != len(labels):
+        raise ValueError("one group ID is required for each valid row")
+    if pd.isna(group_values).any():
+        raise ValueError("group IDs must not be missing")
+
+    chronological_train, holdout, cutoff = chronological_split(
+        features, labels, timestamps, holdout_fraction
+    )
+    holdout_groups = np.unique(group_values[holdout])
+    purge_mask = np.isin(group_values[chronological_train], holdout_groups)
+    train = chronological_train[~purge_mask]
+    purged = chronological_train[purge_mask]
+    if not len(train) or not len(holdout):
+        raise ValueError("combined split must retain non-empty train and holdout rows")
+    if np.intersect1d(group_values[train], group_values[holdout]).size:
+        raise RuntimeError("combined split failed to separate user groups")
+    if (timestamps[train] >= cutoff).any() or (timestamps[holdout] < cutoff).any():
+        raise RuntimeError("combined split failed to preserve chronological ordering")
+    return train, holdout, cutoff, purged
+
+
 def _metrics(actual: np.ndarray, predicted: np.ndarray) -> dict[str, float | None]:
     if np.unique(actual).size < 2 or np.unique(predicted).size < 2:
         correlation = None
@@ -434,6 +463,7 @@ def train_baselines(
     )
     features, labels, timestamps = build_features(frame)
     valid_groups = None
+    purged_indexes = np.array([], dtype=np.int64)
     cutoff: int | None
     if split_strategy == "chronological":
         train_indexes, holdout_indexes, cutoff = chronological_split(
@@ -452,8 +482,31 @@ def train_baselines(
         )
         cutoff = None
         protocol = f"user-disjoint local holdout from {dataset_scope}"
+    elif split_strategy == "combined":
+        if groups is None:
+            raise ValueError("user groups are required for combined evaluation")
+        source_groups = np.asarray(groups)
+        if source_groups.ndim != 1 or len(source_groups) != len(frame):
+            raise ValueError("one group ID is required for each cached sample row")
+        valid_groups = source_groups[features.index.to_numpy()]
+        (
+            train_indexes,
+            holdout_indexes,
+            cutoff,
+            purged_indexes,
+        ) = combined_chronological_user_split(
+            features,
+            labels,
+            timestamps,
+            valid_groups,
+            holdout_fraction=holdout_fraction,
+        )
+        protocol = (
+            f"future-time and unseen-user local holdout from {dataset_scope}; "
+            "pre-cutoff rows from holdout users are purged from training"
+        )
     else:
-        raise ValueError("split_strategy must be 'chronological' or 'user'")
+        raise ValueError("split_strategy must be 'chronological', 'user', or 'combined'")
     train = features.iloc[train_indexes]
     holdout = features.iloc[holdout_indexes]
     train_labels = labels[train_indexes]
@@ -531,11 +584,34 @@ def train_baselines(
                 "train_user_count": len(train_users),
                 "holdout_user_count": len(holdout_users),
                 "user_overlap_count": len(train_users & holdout_users),
-                "holdout_fraction_unit": "users",
-                "split_unit": "user_group",
-                "random_seed": 42,
             }
         )
+        if split_strategy == "user":
+            evaluation.update(
+                {
+                    "holdout_fraction_unit": "users",
+                    "split_unit": "user_group",
+                    "random_seed": 42,
+                }
+            )
+        if split_strategy == "combined":
+            purged_users = set(valid_groups[purged_indexes])
+            evaluation.update(
+                {
+                    "split_unit": "future_time_unseen_user",
+                    "train_time_max_utc": pd.to_datetime(
+                        timestamps[train_indexes].max(), unit="s", utc=True
+                    ).isoformat(),
+                    "purged_rows": len(purged_indexes),
+                    "purged_user_count": len(purged_users),
+                    "holdout_time_min_utc": pd.to_datetime(
+                        timestamps[holdout_indexes].min(), unit="s", utc=True
+                    ).isoformat(),
+                    "holdout_time_max_utc": pd.to_datetime(
+                        timestamps[holdout_indexes].max(), unit="s", utc=True
+                    ).isoformat(),
+                }
+            )
 
     report = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),

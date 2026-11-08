@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ViralScope | Model details</title>
+  <link rel="stylesheet" href="/web/presentation.css?v=20261108-14">
+  <script defer src="/web/image-viewer.js?v=20261110"></script>
+  <script defer src="/web/pages.js"></script>
+</head>
+<body data-page="model">
+  <header>
+    <a class="brand" href="/"><strong>ViralScope</strong><span>benchmark lab</span></a>
+    <nav class="site-nav" aria-label="Project pages">
+      <a href="/">Dashboard</a><a href="/dataset">Dataset</a><a href="/models" aria-current="page">Models</a><a href="/demo">Demo</a><a href="/solutions">Solutions</a><a href="/references">References</a>
+    </nav>
+    <span class="header-note"><a href="/models">All models</a></span>
+  </header>
+  <main>
+    <section class="page-head">
+      <div>
+        <h1 id="model-title">Model details</h1>
+        <p id="model-family" class="lede">Loading model...</p>
+      </div>
+      <div class="scope">Final fit<br><span id="model-fit-rows">--</span> train rows</div>
+    </section>
+    <div data-error class="callout" role="alert"></div>
+
+    <section class="split">
+      <div>
+        <h2>Why this model</h2>
+        <p id="model-why" class="lede"></p>
+        <h2 class="section">Training recipe</h2>
+        <p id="model-training" class="lede"></p>
+        <div class="profile-details">
+          <div>Final artifact: <code id="model-path"></code></div>
+          <div>Explanation: <span id="model-explanation"></span></div>
+        </div>
+      </div>
+      <div>
+        <h2>Attributes used</h2>
+        <ul id="feature-list" class="rule-list"></ul>
+        <div class="callout">No image, user ID, post ID, profile snapshot, coordinate, or post-publication engagement feature is used.</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Evaluation metrics</h2>
+      <p class="section-intro">Train metrics show fit; chronological and unseen-user holdouts show different generalization settings. All evaluation rows are from the labeled train split.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Split</th><th>Rows</th><th>SRC</th><th>MAE</th><th>RMSE</th><th>R²</th></tr></thead>
+          <tbody id="model-metrics"></tbody>
+        </table>
+      </div>
+      <p id="model-limits" class="small"></p>
+    </section>
+
+    <section class="section">
+      <h2>All-test inference distribution</h2>
+      <p id="test-summary" class="callout"></p>
+      <p class="small">This model produced one prediction for every row in all 29 public test Parquet shards. Test targets are withheld, so these distributions do not measure model quality.</p>
+    </section>
+
+    <div class="actions"><a id="try-this-model" class="button-link" href="/demo">Try this model</a><a class="button-link secondary" href="/models">Compare all models</a></div>
+  </main>
+  <footer><strong>Powered by SMP Challenge</strong><span>Individual model analysis</span></footer>
+</body>
+</html>

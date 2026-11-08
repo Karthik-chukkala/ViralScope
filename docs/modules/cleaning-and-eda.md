@@ -60,6 +60,20 @@ For all train rows after building the full cache:
 .venv/bin/python -u -m viralscope.sample_eda --data data/train-all-safe.parquet --manifest data/train-all-safe-manifest.json --output artifacts/full-train-eda.json --plot artifacts/diagnostics/full-train-temporal-text.png
 ```
 
+### Full-train quality audit
+
+Run the all-shard schema, range, and duplicate checks locally:
+
+```bash
+.venv/bin/python -m viralscope.data_quality
+```
+
+`artifacts/full-train-quality.json` audits all 305,613 cached rows. It found no missing/nonnumeric/nonfinite timestamps, no invalid timestamps, and no missing/nonnumeric/nonfinite/negative labels. Timestamps span `2015-02-28T16:00:00Z` to `2016-02-29T15:54:26Z`; labels range from 1.00 to 16.56. The 11 nonblank categories are summarized in the report.
+
+The safe cache contains 1,139 exact duplicate rows, 4,876 rows beyond the first row for repeated feature-input groups, and 2,624 repeated-input groups with differing labels. These are aggregate comparisons over the six cached inputs and label, not post-identity checks: post IDs are intentionally absent. No rows were removed because the cache does not support a defensible duplicate-identity policy. The report writes no raw text or IDs.
+
+For post identity, the separate full pinned-shard metadata scan reads `Uid`/`Pid` only transiently and stores aggregates in `artifacts/full-metadata-eda.json`. It covered 305,613 rows / 49 shards, found 38,312 unique users, 305,613 unique post IDs, zero duplicate post-ID rows, zero invalid timestamps, and no missing IDs/categories/subcategories/concepts. It found 10,553 blank/missing titles and three blank/missing tag fields. No IDs or raw text are written to the report.
+
 ## Implemented Slice: Target Labels
 
 `viralscope/target_audit.py` reads each `data/train-*.parquet` shard from Hugging Face with `HfFileSystem`, then reads the `label` column only for that shard using PyArrow. It does not read title, tags, user/profile fields, image metadata, or image bytes. Labels are accumulated as scalar values (about 306K floats), not as decoded image objects.

@@ -1,0 +1,136 @@
+{
+  "generated_at_utc": "2026-11-08T13:09:55.586573+00:00",
+  "dataset": {
+    "repository": "smpchallenge/SMP-Image",
+    "revision": "f131dba653a05c0e3c6294388f81ed3fbd9c71a0",
+    "split": "train",
+    "rows": 305613,
+    "shards": 49,
+    "sample_method": "all_train_shards"
+  },
+  "quality": {
+    "rows": 305613,
+    "schema": {
+      "Postdate": {
+        "dtype": "str",
+        "null_count": 0,
+        "blank_count": 0
+      },
+      "Category": {
+        "dtype": "str",
+        "null_count": 0,
+        "blank_count": 0
+      },
+      "Subcategory": {
+        "dtype": "str",
+        "null_count": 0,
+        "blank_count": 0
+      },
+      "Concept": {
+        "dtype": "str",
+        "null_count": 0,
+        "blank_count": 0
+      },
+      "Title": {
+        "dtype": "str",
+        "null_count": 0,
+        "blank_count": 10553
+      },
+      "Alltags": {
+        "dtype": "str",
+        "null_count": 0,
+        "blank_count": 3
+      },
+      "label": {
+        "dtype": "float32",
+        "null_count": 0,
+        "blank_count": 0
+      }
+    },
+    "timestamps": {
+      "nonnumeric_count": 0,
+      "missing_count": 0,
+      "nonfinite_count": 0,
+      "invalid_datetime_count": 0,
+      "min_utc": "2015-02-28T16:00:00+00:00",
+      "max_utc": "2016-02-29T15:54:26+00:00",
+      "seconds_quantiles": {
+        "0.0": 1425139200.0,
+        "0.01": 1425977474.44,
+        "0.5": 1446278938.0,
+        "0.99": 1456630806.0,
+        "1.0": 1456761266.0
+      }
+    },
+    "labels": {
+      "nonnumeric_count": 0,
+      "missing_count": 0,
+      "nonfinite_count": 0,
+      "negative_count": 0,
+      "min": 1.0,
+      "max": 16.559999
+    },
+    "categories": {
+      "distinct_nonblank": 11,
+      "top_15": [
+        {
+          "category": "Travel&Active&Sports",
+          "count": 66469
+        },
+        {
+          "category": "Holiday&Celebrations",
+          "count": 54751
+        },
+        {
+          "category": "Fashion",
+          "count": 49282
+        },
+        {
+          "category": "Entertainment",
+          "count": 29590
+        },
+        {
+          "category": "Social&People",
+          "count": 23351
+        },
+        {
+          "category": "Whether&Season",
+          "count": 20292
+        },
+        {
+          "category": "Animal",
+          "count": 19992
+        },
+        {
+          "category": "Food",
+          "count": 16727
+        },
+        {
+          "category": "Urban",
+          "count": 15272
+        },
+        {
+          "category": "Electronics",
+          "count": 5613
+        },
+        {
+          "category": "Family",
+          "count": 4274
+        }
+      ]
+    },
+    "duplicates": {
+      "exact_duplicate_rows": 1139,
+      "duplicate_input_rows": 4876,
+      "duplicate_input_groups": 3047,
+      "duplicate_input_groups_with_conflicting_labels": 2624,
+      "duplicate_identity_check": "Post IDs are not in the safe local cache; this check compares exact cached inputs and full cached rows only."
+    },
+    "privacy": {
+      "raw_text_written": false,
+      "raw_ids_read": false,
+      "raw_values_written": false,
+      "image_bytes_read": false
+    }
+  }
+}

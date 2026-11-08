@@ -2,7 +2,7 @@
 
 ## Status
 
-Six learned variants are now fitted on all 305,613 labeled train rows from all 49 pinned shards. Holdout metrics remain separate: a chronological 20% post split, a user-disjoint 20% user-group split, and 15/20/25% chronological sensitivity windows. The public test split receives inference only because its labels are withheld. Per-prediction linear contributions and CatBoost SHAP values are exposed in the local demo.
+Six learned variants are now fitted on all 305,613 labeled train rows from all 49 pinned shards. Holdout metrics remain separate: a chronological 20% post split, a user-disjoint 20% user-group split, a combined future-time/unseen-user split, and 15/20/25% chronological sensitivity windows. The public test split receives inference only because its labels are withheld. Per-prediction linear contributions and CatBoost SHAP values are exposed in the local demo.
 
 ## Purpose and Scope
 
@@ -26,6 +26,8 @@ The timestamp is parsed as Unix seconds. Invalid timestamps and missing, nonfini
 ## Evaluation Protocol
 
 Rows are ordered by `Postdate`; the final 20% by time is a local holdout and all earlier rows are training data. Equal timestamps at the cutoff go to the holdout. This future-time evaluation may share users across partitions. A separate user-disjoint group holdout is reported below. The current model fit uses all 49 physical train shards.
+
+The combined evaluation also uses the chronological tail as its future-time holdout, then removes every pre-cutoff training row whose `Uid` appears in that holdout. This purges users, not posts from the future period: all holdout rows remain at or after the cutoff, train rows remain earlier, and user overlap is zero. It reports the purged-row count because the remaining training population is smaller. `Uid` values are fetched from the manifest's exact pinned shards, aligned to the safe-cache row order, used only in memory, and never written.
 
 Report **SRC** (Spearman rank correlation) and **MAE** (challenge-aligned metrics), plus **RMSE** and **R²**. Training metrics diagnose fit; holdout metrics are the main result. The public HF test labels are withheld placeholders and are not scored.
 
@@ -78,6 +80,16 @@ The full-train user-disjoint result uses 238,630 train posts from 30,649 users a
 | Text + context Ridge | 0.634 | 1.490 | 0.546 | 1.708 |
 
 The group holdout is randomly assigned by user and is not time-ordered. It complements, rather than replaces, the chronological evaluation. Text + context leads on the user-disjoint holdout; its performance is lower than on the chronological holdout, which is consistent with a harder unseen-user setting but does not isolate user effects from the different holdout composition. A future-time, unseen-user evaluation would require a combined split protocol.
+
+### Combined future-time/unseen-user evaluation
+
+Run the all-train combined protocol with:
+
+```bash
+HF_HUB_DOWNLOAD_TIMEOUT=120 .venv/bin/python -u -m viralscope.combined_eval --workers 4
+```
+
+The report is `artifacts/combined-evaluation.json`. It records the chronological cutoff, counts of train/holdout/purged rows and users, zero-overlap check, and six-model metrics. This is a more restrictive local holdout, not the official test set, and the reported metrics must not be used to tune on the same holdout.
 
 The aggregate report is `artifacts/user-aware-metrics.json`; model files and plots are kept in `artifacts/models/user-aware/` and `artifacts/diagnostics/user-aware/`. The report contains user counts and overlap only, never raw IDs.
 

@@ -23,6 +23,7 @@ The source is Hugging Face `smpchallenge/SMP-Image`, pinned to revision `f131dba
 | Test inference cache | 180,581 rows from all 29 test shards; six non-image input columns, no labels or IDs, compressed Parquet about 8.4 MiB |
 | Quick EDA sample | 42,730 rows from seven evenly spaced train shards; retained for fast smoke checks |
 | Full-train text EDA | 10,553 missing/blank titles (3.45%), 3 missing/blank tag fields, no missing timestamps/categories, 11 categories |
+| Full-train identity scan | 305,613 unique post IDs, 38,312 unique users, 0 duplicate post-ID rows, 0 invalid timestamps; IDs were not saved |
 | Full dataset size | About 37.78 GiB of original image-bearing Parquet; only column-projected non-image caches were created |
 | Images | No dataset image bytes were included in train/test caches or the demo |
 
@@ -43,12 +44,13 @@ The published train and test-input caches include raw title/tag text but exclude
 ## 3. What Is Implemented
 
 1. **Dataset access and audit:** pinned revision, license/provenance report, split sizes, and the complete label-only scan. Code: `viralscope/dataset_audit.py`, `viralscope/target_audit.py`.
-2. **EDA:** quick sample checks plus full-train month/category/title/tag aggregates and charts. Code: `viralscope/metadata_eda.py`, `viralscope/sample_eda.py`; reports: `artifacts/metadata-eda.json`, `artifacts/full-train-eda.json`.
+2. **EDA and quality:** quick sample checks plus full-train month/category/title/tag aggregates, schema/range checks, and duplicate-input checks. Code: `viralscope/metadata_eda.py`, `viralscope/sample_eda.py`, `viralscope/data_quality.py`; reports: `artifacts/metadata-eda.json`, `artifacts/full-train-eda.json`, `artifacts/full-train-quality.json`.
 3. **Column-projected caches:** all train rows in `data/train-all-safe.parquet`; all test inputs in `data/test-inference-inputs.parquet`. Manifests record pinned revision/shards. No IDs, profiles, coordinates, or image bytes.
-4. **Six learned model variants:** TF-IDF Ridge, squared-error SGD, Huber SGD, two CatBoost context models, and fused text/context Ridge, plus a median baseline. Chronological, user-disjoint, and multi-cutoff evaluation. Code: `viralscope/train_baselines.py`, `viralscope/user_aware_eval.py`, `viralscope/temporal_sensitivity.py`; final refit: `viralscope/final_models.py`.
+4. **Six learned model variants:** TF-IDF Ridge, squared-error SGD, Huber SGD, two CatBoost context models, and fused text/context Ridge, plus a median baseline. Chronological, user-disjoint, combined future-time/unseen-user, and multi-cutoff evaluation. Code: `viralscope/train_baselines.py`, `viralscope/user_aware_eval.py`, `viralscope/combined_eval.py`, `viralscope/temporal_sensitivity.py`; final refit: `viralscope/final_models.py`.
 5. **All-test inference:** all six final models generate predictions for 180,581 test rows. The public test split is unlabeled, so no test accuracy is reported. Code: `viralscope/inference_cache.py`, `viralscope/test_inference.py`; outputs: `artifacts/test-inference-predictions.parquet`, `artifacts/test-inference-report.json`.
 6. **Presentation site:** Dashboard, Dataset, Models, Demo, and Solutions sections with full-train analyses, sample-vs-full provenance, three holdout protocols, six models, charts, random synthetic examples, and test prediction distributions. Code: `viralscope/demo_app.py`, `web/index.html`.
-7. **Module documentation:** [Dataset Access and Audit](modules/dataset-access-and-audit.md), [Cleaning and EDA](modules/cleaning-and-eda.md), [Modeling Baselines](modules/modeling-baselines.md), and [Local Demo](modules/local-demo.md).
+7. **Explanation validation:** shared linear-contribution and CatBoost SHAP decomposition; deterministic repeatability, additive reconstruction (maximum error below `7.2e-15`), and whitespace-invariance checks on 128 rows per model. All six models passed; report: `artifacts/explanation-stability.json`.
+8. **Review validation documentation:** [Review Validation](modules/review-validation.md) records the combined protocol, full-train checks, explanation audit scope, and reproducible commands.
 
 The local site is currently running on loopback at port 8000. It was checked in a browser at desktop and mobile widths; form submission, dataset/text/time visualizations, both evaluation panels, holdout diagnostic plots, and explanations work without horizontal overflow.
 
@@ -67,6 +69,22 @@ The principal evaluation uses all 305,613 labeled train rows: 244,490 for traini
 | Text + context Ridge | 0.930 | 0.587 | 0.634 | 1.490 | 1.917 | 0.402 |
 
 Text + context Ridge leads the chronological holdout (SRC 0.634, MAE 1.490). Huber SGD is the weakest variant and remains as a loss-function comparison. Train/holdout gaps still indicate overfitting; parameters were not tuned on the holdout.
+
+### Combined future-time/unseen-user holdout
+
+The 20% chronological tail starts at `2016-01-17T11:26:49Z` and contains 61,123 future-time posts from 11,792 users. To prevent user leakage, 66,886 pre-cutoff rows from 4,836 of those users were purged. The remaining training set has 177,604 rows from 26,520 users; the train/holdout user overlap is zero. This uses the same fixed model configurations, with no tuning on this holdout.
+
+| Model | Holdout SRC | Holdout MAE | Holdout RMSE | Holdout R² |
+| --- | ---: | ---: | ---: | ---: |
+| Median | n/a | 1.998 | 2.509 | -0.025 |
+| TF-IDF + Ridge | 0.486 | 1.762 | 2.191 | 0.218 |
+| TF-IDF + SGD | 0.462 | 1.756 | 2.191 | 0.219 |
+| TF-IDF + Huber SGD | 0.283 | 2.002 | 2.532 | -0.044 |
+| Context CatBoost | 0.229 | 1.969 | 2.445 | 0.027 |
+| Context CatBoost shallow | 0.239 | 1.951 | 2.430 | 0.039 |
+| Text + context Ridge | **0.515** | **1.733** | **2.141** | **0.254** |
+
+These are local results on a more restrictive holdout, not official test scores. They are reported for review and must not be used to tune against this same holdout. Full report: `artifacts/combined-evaluation.json`.
 
 Full-train holdout residual, actual/predicted, and category-error plots are saved under `artifacts/diagnostics/`. Category metrics exclude groups with fewer than 50 holdout rows.
 
@@ -128,15 +146,15 @@ The API routes are `GET /api/health`, `GET /api/dataset`, `GET /api/metrics`, `G
 
 Latest test result: **27 tests passed** after full-train fitting and test inference. API smoke checks returned HTTP 200 for all six final models, full-train EDA, all-test prediction summaries, and all three evaluation views.
 
-## 6. What Remains
+## 6. Completed Review Checks and Remaining Limits
 
-Prioritize work in this order:
+- **Combined evaluation:** completed on the all-train split; future-time and unseen-user constraints both hold, with 0 user overlap. The holdout is not an official test and was not used for tuning.
+- **Data quality:** full-train schema, timestamp/label ranges, blanks, exact cached-row duplicates, repeated inputs, and conflicting labels were audited. A separate pinned-shard identity scan found no duplicate post IDs; the safe cache itself omits IDs.
+- **Explanation validation:** contributions reconstruct predictions and remain repeatable under identical inputs and whitespace-only formatting changes. Semantic paraphrase robustness and causal validity are not established.
+- **Evaluation scope:** one combined cutoff is now reported; the separate 15/20/25% chronological windows remain nested and are not independent test sets.
+- **License gate:** supervisor review of the full Community License and AUP is still required before public deployment, redistribution, or image use.
+- **Image branch:** image modeling remains deferred; the current trained models use text and context only.
 
-1. **Strengthen evaluation:** consider a combined future-time/unseen-user protocol and keep model tuning on a separate validation split. The existing user-disjoint check is a random user-group split, not a future-time test; the three temporal sensitivity windows are nested, not independent.
-2. **Broaden EDA:** add more type/range and duplicate policy checks, plus interpretation of full-train distributions. Keep the 42,730-row smoke findings labeled as sample-only; image quality remains deferred until license review.
-3. **Validate explanations:** inspect linear term contributions and CatBoost SHAP values on representative inputs; test explanation stability and avoid causal wording.
-4. **Reproducibility:** record/pin the successful dependency versions and add a concise offline review procedure with a tested sample input.
-5. **License gate:** have the supervisor review the full Community License and AUP before any public deployment or redistribution.
-6. **Image branch:** only after license approval and after the text/context milestone is accepted, consider a frozen pretrained image feature extractor and cached embeddings. The current caches intentionally omit images.
+See [Review Validation](modules/review-validation.md) for audit methods and rerun commands.
 
 Do not report sample EDA as full-train metadata statistics, call the public `-1` test split labeled, claim official test performance, or imply these historical Flickr scores forecast current engagement on another platform.

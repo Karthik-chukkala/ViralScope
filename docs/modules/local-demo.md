@@ -12,7 +12,7 @@ The selected model can be TF-IDF + Ridge, squared-error SGD, Huber SGD, standard
 
 ## API
 
-- `GET /`: review UI.
+- `GET /`: project dashboard; `/dataset`, `/models`, `/demo`, `/solutions`, and `/references` provide dedicated views.
 - `GET /api/health`: local process health.
 - `GET /api/dataset`: full-train label/text/time/category summaries, separate sample-only charts, and test prediction distributions without test metrics.
 - `GET /api/metrics`: chronological metrics/diagnostics plus aggregate user-disjoint metrics from `artifacts/baseline-metrics.json` and `artifacts/user-aware-metrics.json`, when present.
@@ -30,7 +30,7 @@ From the project root, after building the full-train cache, evaluating the holdo
 .venv/bin/python -m uvicorn viralscope.demo_app:app --host 127.0.0.1 --port 8000
 ```
 
-Open `http://127.0.0.1:8000`. The server binds to loopback by default and is not exposed to the network. The page shows full-train target/category/text/time analyses plus a separately labeled seven-shard preview, chronological/user-disjoint/temporal model comparisons, unlabeled test prediction distributions, holdout diagnostic plots, and a synthetic random-example control. Users can edit the example before requesting an estimate/explanation.
+Open `http://127.0.0.1:8000`. The server binds to loopback by default and is not exposed to the network. Dataset contains the full-train analyses, separately labeled seven-shard preview, and unlabeled test prediction distributions. Models contains the chronological, user-disjoint, and temporal comparisons and holdout diagnostic plots. Solutions records the work and decisions. Demo provides an editable synthetic example for requesting an estimate and explanation.
 
 ## Validation
 
