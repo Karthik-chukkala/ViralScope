@@ -25,6 +25,7 @@ class MetadataEdaTests(unittest.TestCase):
 
         self.assertEqual(selected, [0, 8, 16, 24, 32, 40, 48])
         self.assertEqual(select_evenly_spaced_shards(shards, 1), [24])
+        self.assertEqual(select_evenly_spaced_shards(shards, 49), shards)
 
     def test_merge_counts_duplicate_ids_across_shard_accumulators(self) -> None:
         first = MetadataAccumulator()

@@ -32,6 +32,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px 24px;
       min-height: 70px;
       padding: 0 clamp(20px, 5vw, 72px);
       border-bottom: 1px solid var(--line);
@@ -39,6 +41,9 @@
     .brand { display: flex; align-items: baseline; gap: 12px; }
     .brand strong { font: 700 25px Georgia, serif; letter-spacing: 0; }
     .brand span, .header-note { color: var(--muted); font-size: 12px; }
+    .site-nav { display: flex; align-items: center; gap: 18px; }
+    .site-nav a { color: var(--muted); font-size: 12px; text-decoration: none; white-space: nowrap; }
+    .site-nav a:hover, .site-nav a:focus-visible { color: var(--green); text-decoration: underline; }
     main { max-width: 1320px; margin: auto; padding: 30px clamp(20px, 5vw, 72px) 50px; }
     .intro { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
     h1 { margin: 0 0 8px; font: 600 34px/1.1 Georgia, serif; letter-spacing: 0; }
@@ -93,9 +98,28 @@
     .category-name { overflow-wrap: anywhere; color: var(--muted); }
     .category-track { height: 6px; background: #dbe8e3; }
     .category-fill { height: 100%; background: var(--coral); }
+    .project-snapshot { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin: 24px 0 34px; }
+    .project-stat { min-width: 0; padding: 11px 0 0; border-top: 3px solid var(--green); }
+    .project-stat:nth-child(2) { border-color: var(--gold); }
+    .project-stat:nth-child(3) { border-color: var(--coral); }
+    .project-stat:nth-child(4) { border-color: #5785a1; }
+    .project-stat b { display: block; font: 600 24px Georgia, serif; }
+    .project-stat span { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .project-lede { max-width: 900px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .model-notes { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
+    .model-notes details { padding: 13px 0; border-top: 1px solid var(--line); }
+    .model-notes summary { color: var(--ink); font-size: 13px; font-weight: 700; cursor: pointer; }
+    .model-notes p { margin: 9px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .solution-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px 36px; }
+    .solution-item { border-top: 2px solid var(--green); padding-top: 10px; }
+    .solution-item:nth-child(2n) { border-color: var(--coral); }
+    .solution-item h3 { margin: 0 0 7px; font-size: 13px; }
+    .solution-item p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
     .sample-eda-figure { margin: 24px 0 0; }
     .sample-eda-figure img { display: block; width: 100%; height: auto; border: 1px solid var(--line); background: white; }
     .sample-eda-figure figcaption { margin-top: 8px; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .test-inference { margin-top: 28px; }
+    .test-inference p { color: var(--muted); font-size: 12px; line-height: 1.5; }
     .metrics-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
     .sample-count { color: var(--muted); font-size: 11px; text-align: right; }
     .metric-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
@@ -109,6 +133,11 @@
     .bar { height: 100%; background: var(--green); }
     .metric-model:nth-child(2) .bar { background: var(--gold); }
     .metric-model:nth-child(3) .bar { background: var(--coral); }
+    .metrics-table-wrap { max-width: 100%; margin-top: 20px; overflow-x: auto; }
+    .metrics-table { width: 100%; min-width: 820px; border-collapse: collapse; font-size: 11px; text-align: right; }
+    .metrics-table th, .metrics-table td { padding: 9px 10px; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .metrics-table thead th { color: var(--muted); font-weight: 700; }
+    .metrics-table th:first-child, .metrics-table td:first-child { text-align: left; }
     .fine-print { max-width: 850px; margin: 18px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
     .diagnostics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
     .temporal-runs { display: grid; gap: 8px; }
@@ -125,6 +154,7 @@
       .intro { align-items: start; flex-direction: column; }
       .workspace { grid-template-columns: 1fr; }
       .result-area { border-left: 0; border-top: 1px solid var(--line); padding: 24px 0 0; }
+      .site-nav { order: 3; width: 100%; overflow-x: auto; padding: 5px 0; }
     }
     @media (max-width: 560px) {
       header { min-height: 62px; }
@@ -132,6 +162,8 @@
       h1 { font-size: 29px; }
       .field-grid, .metric-grid { grid-template-columns: 1fr; }
       .metric-grid { gap: 16px; }
+      .project-snapshot { grid-template-columns: 1fr 1fr; }
+      .model-notes, .solution-list { grid-template-columns: 1fr; }
       .dataset-kpis { grid-template-columns: 1fr 1fr; }
       .dataset-grid { grid-template-columns: 1fr; gap: 24px; }
       .category-row { grid-template-columns: minmax(95px, 1fr) 1.3fr auto; gap: 8px; }
@@ -145,10 +177,17 @@
 <body>
   <header>
     <div class="brand"><strong>ViralScope</strong><span>benchmark lab</span></div>
+    <nav class="site-nav" aria-label="Project sections">
+      <a href="#dashboard">Dashboard</a>
+      <a href="#dataset">Dataset</a>
+      <a href="#models">Models</a>
+      <a href="#demo">Demo</a>
+      <a href="#solutions">Solutions</a>
+    </nav>
     <div class="header-note">SMP-Image · text + context · local inference</div>
   </header>
   <main>
-    <section class="intro">
+    <section id="dashboard" class="intro">
       <div>
         <h1>Estimate a post's benchmark popularity</h1>
         <p>Compare lightweight models trained on historical post text and planned publishing context. This is a research estimate, not a forecast of live reach.</p>
@@ -156,7 +195,15 @@
       <div class="scope-mark">Part 1<br>Image branch deferred</div>
     </section>
 
-    <section class="workspace" aria-label="Prediction workspace">
+    <section class="project-snapshot" aria-label="Project status">
+      <div class="project-stat"><b>305,613</b><span>verified labeled train rows</span></div>
+      <div class="project-stat"><b id="dashboard-model-count">6</b><span>learned model variants in the expanded ladder</span></div>
+      <div class="project-stat"><b>0</b><span>test labels scored; public test labels are withheld</span></div>
+      <div class="project-stat"><b>26</b><span>automated tests passing</span></div>
+    </section>
+    <p class="project-lede">Research prototype for estimating a historical SMP popularity score before publication. It uses text, category, and planned-time context; it does not claim to predict live reach. Dataset-derived metadata charts are labeled by their coverage, and the public test split is not scored because its labels are withheld.</p>
+
+    <section id="demo" class="workspace" aria-label="Prediction workspace">
       <div>
         <h2>Draft inputs</h2>
         <form id="prediction-form">
@@ -191,7 +238,10 @@
           <label for="model">Model
             <select id="model" name="model">
               <option value="tfidf_ridge">Text · TF-IDF + Ridge</option>
+              <option value="tfidf_sgd">Text · TF-IDF + SGD</option>
+              <option value="tfidf_sgd_huber">Text · TF-IDF + Huber SGD</option>
               <option value="context_catboost">Context · CatBoost</option>
+              <option value="context_catboost_shallow">Context · CatBoost shallow</option>
               <option value="text_context_ridge">Text + context · Ridge</option>
             </select>
           </label>
@@ -219,7 +269,7 @@
     </section>
 
     <hr class="divider">
-    <section class="dataset-snapshot" aria-labelledby="dataset-title">
+    <section id="dataset" class="dataset-snapshot" aria-labelledby="dataset-title">
       <div class="metrics-head">
         <h2 id="dataset-title">Dataset snapshot</h2>
         <div id="dataset-revision" class="sample-count">Loading audits…</div>
@@ -237,25 +287,48 @@
           <div class="chart-axis"><span>1.00</span><span>Popularity label</span><span>16.56</span></div>
         </div>
         <div>
-          <h3 id="category-heading">Category frequency · sampled shards</h3>
+          <h3 id="category-heading">Full-train category frequencies</h3>
           <div id="category-bars" class="category-bars"></div>
         </div>
       </div>
       <figure class="sample-eda-figure">
+        <img src="/api/diagnostics/full-train-temporal-text.png" alt="Full-train charts of posts per month, all category counts, title character lengths, and tag token counts.">
+        <figcaption id="full-train-eda-caption">Full-train monthly, category, title-length, and tag-length distributions.</figcaption>
+      </figure>
+      <figure class="sample-eda-figure">
         <img src="/api/diagnostics/sample-temporal-text.png" alt="Sample-only charts of posts per month and distributions of title character length and tag token count.">
         <figcaption id="sample-eda-caption">Sample-only temporal and text coverage; these distributions are not full-train estimates.</figcaption>
       </figure>
-      <p class="fine-print">Target summary is a complete label-only scan. Metadata frequencies use seven evenly spaced shards (not a random sample); do not treat them as exact full-train proportions. No image bytes, raw text, or IDs are shown.</p>
+      <section id="test-inference-summary" class="test-inference" aria-labelledby="test-inference-title" hidden>
+        <div class="metrics-head">
+          <h3 id="test-inference-title">All-shard test inference · not scored</h3>
+          <div id="test-inference-count" class="sample-count"></div>
+        </div>
+        <p id="test-inference-note">Predictions cover every public test row. Labels are withheld, so these are not accuracy metrics. Regression outputs are unconstrained and may fall outside the full-train label range.</p>
+        <div class="metrics-table-wrap">
+          <table class="metrics-table">
+            <thead><tr><th>Model</th><th>Rows</th><th>Min</th><th>P10</th><th>Median</th><th>Mean</th><th>P90</th><th>Max</th><th>Outside train label range</th></tr></thead>
+            <tbody id="test-inference-body"></tbody>
+          </table>
+        </div>
+      </section>
+      <p class="fine-print">Full-train figures use all 305,613 labeled training rows. The separate seven-shard preview is not a random sample. No raw text, user IDs, post IDs, coordinates, or images are shown.</p>
     </section>
 
     <hr class="divider">
-    <section aria-labelledby="metrics-title">
+    <section id="models" aria-labelledby="metrics-title">
       <div class="metrics-head">
         <h2 id="metrics-title">Chronological holdout</h2>
         <div id="sample-count" class="sample-count">Loading evaluation…</div>
       </div>
       <div id="metrics" class="metric-grid"></div>
-      <p class="fine-print">SRC measures ranking agreement (higher is better). MAE is the average absolute error in label units (lower is better). Scores are from a seven-shard sample and a local time-ordered holdout, not the official test set. Feature contributions describe model behavior, not causes.</p>
+      <div class="metrics-table-wrap">
+        <table class="metrics-table">
+          <thead><tr><th>Model</th><th>Train rows</th><th>Holdout rows</th><th>Train SRC</th><th>Train MAE</th><th>Holdout SRC</th><th>Holdout MAE</th><th>Holdout RMSE</th><th>Holdout R²</th></tr></thead>
+          <tbody id="model-metrics-body"></tbody>
+        </table>
+      </div>
+      <p class="fine-print">SRC measures ranking agreement (higher is better). MAE is the average absolute error in label units (lower is better). This is a local chronological holdout from all labeled train rows, not the official test set. Feature contributions describe model behavior, not causes.</p>
     </section>
 
     <hr id="user-aware-divider" class="divider" hidden>
@@ -282,7 +355,7 @@
     <section aria-labelledby="diagnostics-title">
       <div class="metrics-head">
         <h2 id="diagnostics-title">Holdout error diagnostics</h2>
-        <div class="sample-count">Local sample · n=8,546</div>
+        <div id="diagnostic-count" class="sample-count">Full-train holdout diagnostics</div>
       </div>
       <div class="diagnostics">
         <figure class="diagnostic-figure">
@@ -298,7 +371,32 @@
           <figcaption>Category MAE slices include categories with at least 50 holdout posts. Smaller groups are omitted.</figcaption>
         </figure>
       </div>
-      <p class="fine-print">These diagnostics describe one chronological holdout drawn from seven sampled shards. They are exploratory and not official test performance.</p>
+      <p class="fine-print">These diagnostics describe the chronological holdout from the full labeled training split. They are not official test performance; the public test labels are withheld.</p>
+    </section>
+
+    <hr class="divider">
+    <section aria-labelledby="model-details-title">
+      <h2 id="model-details-title">Model methods</h2>
+      <div class="model-notes">
+        <details><summary>TF-IDF + Ridge</summary><p>Text-only baseline using title and tags as unigram/bigram TF-IDF features. Ridge regression uses alpha 2. Chosen as a fast, interpretable sparse-text baseline; signed term contributions are shown for individual predictions.</p></details>
+        <details><summary>TF-IDF + SGD, squared error</summary><p>Text-only stochastic linear regressor with L2 penalty, alpha 1e-5, and early stopping. Tests a scalable optimizer against closed-form Ridge on the same text representation.</p></details>
+        <details><summary>TF-IDF + SGD, Huber loss</summary><p>Text-only stochastic linear regressor with Huber loss, L2 penalty, alpha 1e-5, and early stopping. Tests a less outlier-sensitive loss; it is retained as a comparison even if its holdout scores are weaker.</p></details>
+        <details><summary>Context CatBoost</summary><p>Category, subcategory, concept, and cyclic UTC hour, weekday, and month. Uses 500 iterations, depth 8, learning rate 0.05. Chosen for nonlinear structured-feature interactions; per-prediction SHAP contributions are available.</p></details>
+        <details><summary>Context CatBoost, shallow</summary><p>Same context fields with 700 iterations, depth 5, and learning rate 0.04. A lower-depth comparison tests whether a shallower tree ensemble generalizes better.</p></details>
+        <details><summary>Text + context Ridge</summary><p>TF-IDF title/tags plus one-hot category, subcategory, and concept and cyclic time features, with Ridge alpha 2. Tests whether structured context adds value beyond text alone.</p></details>
+      </div>
+      <p class="fine-print">All six variants use the supplied popularity label. Holdout metrics are reported separately from the final versions refit on all 305,613 train rows for inference.</p>
+    </section>
+
+    <hr class="divider">
+    <section id="solutions" aria-labelledby="solutions-title">
+      <h2 id="solutions-title">Work completed and decisions</h2>
+      <div class="solution-list">
+        <article class="solution-item"><h3>Dataset access</h3><p>Pinned the SMP-Image revision, confirmed 305,613 labeled train rows, and treated sampled -1 test labels as withheld rather than scoreable.</p></article>
+        <article class="solution-item"><h3>Remote-read bottleneck</h3><p>Replaced serial full scans for early EDA with bounded concurrent column projection. The full-train cache uses all 49 train shards but excludes image bytes and profile/location fields.</p></article>
+        <article class="solution-item"><h3>Leakage-aware evaluation</h3><p>Added chronological, user-disjoint, and multi-cutoff sensitivity reports. User IDs are used only transiently to make disjoint groups and are never model features or saved.</p></article>
+        <article class="solution-item"><h3>Scope and limits</h3><p>Image modeling remains deferred. All 29 test shards have inference predictions, but labels are withheld so test accuracy is unavailable. The full license is included; public image display and deployment still need AUP/supervisor review.</p></article>
+      </div>
     </section>
   </main>
   <footer>
@@ -369,7 +467,10 @@
     let previousExampleIndex = -1;
     const metricNames = {
       tfidf_ridge: "Text · TF-IDF + Ridge",
+      tfidf_sgd: "Text · TF-IDF + SGD",
+      tfidf_sgd_huber: "Text · TF-IDF + Huber SGD",
       context_catboost: "Context · CatBoost",
+      context_catboost_shallow: "Context · CatBoost shallow",
       text_context_ridge: "Text + context · Ridge"
     };
 
@@ -383,7 +484,7 @@
       for (const field of ["title", "tags", "category", "subcategory", "concept", "planned_at"]) {
         form.elements[field].value = example[field];
       }
-      const models = ["tfidf_ridge", "context_catboost", "text_context_ridge"];
+      const models = ["tfidf_ridge", "tfidf_sgd", "tfidf_sgd_huber", "context_catboost", "context_catboost_shallow", "text_context_ridge"];
       form.elements.model.value = models[Math.floor(Math.random() * models.length)];
       document.querySelector("#score").textContent = "—";
       document.querySelector("#result-model").textContent = "";
@@ -410,7 +511,15 @@
       const missingRate = 100 * data.metadata_sample.missing_titles / data.metadata_sample.rows;
       document.querySelector("#sample-title-missing").textContent = `${missingRate.toFixed(1)}% missing titles in sample`;
       document.querySelector("#dataset-revision").textContent = `Revision ${data.revision.slice(0, 12)}`;
-      document.querySelector("#category-heading").textContent = `Category frequency · ${data.metadata_sample.shards_scanned} of ${data.metadata_sample.shards_available} shards`;
+      document.querySelector("#category-heading").textContent = `Category frequency · all ${data.train_rows.toLocaleString()} train rows`;
+      if (data.full_train_eda) {
+        const eda = data.full_train_eda;
+        document.querySelector("#full-train-eda-caption").textContent =
+          `Full train: ${eda.rows.toLocaleString()} rows, ` +
+          `${eda.missing_or_blank.Title.toLocaleString()} missing titles, ` +
+          `median title ${eda.title_character_lengths.median} characters, ` +
+          `median ${eda.tag_token_counts.median} tag tokens.`;
+      }
       if (data.sample_text_temporal_eda) {
         const eda = data.sample_text_temporal_eda;
         document.querySelector("#sample-eda-caption").textContent =
@@ -429,7 +538,7 @@
         histogram.append(bar);
       });
 
-      const categories = data.metadata_sample.categories;
+      const categories = data.full_train_eda?.category_frequencies || data.metadata_sample.categories.map(item => ({category: item.value, count: item.count}));
       const maxCategory = Math.max(...categories.map((item) => item.count));
       const categoryRoot = document.querySelector("#category-bars");
       categories.forEach((item) => {
@@ -437,7 +546,7 @@
         row.className = "category-row";
         const name = document.createElement("span");
         name.className = "category-name";
-        name.textContent = item.value;
+        name.textContent = item.category ?? item.value;
         const track = document.createElement("div");
         track.className = "category-track";
         const fill = document.createElement("div");
@@ -450,6 +559,27 @@
         row.append(name, track, count);
         categoryRoot.append(row);
       });
+
+      if (data.test_inference) {
+        const inference = data.test_inference;
+        document.querySelector("#test-inference-summary").hidden = false;
+        document.querySelector("#test-inference-count").textContent = `${inference.prediction_rows.toLocaleString()} rows · ${inference.test_shards} shards · all models`;
+        const root = document.querySelector("#test-inference-body");
+        Object.entries(inference.models).forEach(([name, summary]) => {
+          const row = document.createElement("tr");
+          [name, summary.rows, summary.min, summary.p10, summary.median, summary.mean, summary.p90, summary.max, summary.outside_train_label_range_count].forEach((value, index) => {
+            const cell = document.createElement(index === 0 ? "th" : "td");
+            cell.textContent = index === 0
+              ? metricNames[value] || value
+              : index === 1
+                ? Number(value).toLocaleString()
+                : Number(value).toFixed(2);
+            if (index === 0) cell.scope = "row";
+            row.append(cell);
+          });
+          root.append(row);
+        });
+      }
     }
 
     async function loadMetrics() {
@@ -457,7 +587,9 @@
       if (!response.ok) throw new Error("Evaluation metrics are unavailable.");
       const data = await response.json();
       document.querySelector("#sample-count").textContent = `${data.evaluation.train_rows.toLocaleString()} train / ${data.evaluation.holdout_rows.toLocaleString()} holdout rows`;
+      document.querySelector("#diagnostic-count").textContent = `Full-train holdout · n=${data.evaluation.holdout_rows.toLocaleString()}`;
       renderMetricCards(document.querySelector("#metrics"), data.metrics);
+      renderDetailedMetrics(data.evaluation, data.metrics);
       if (data.user_aware) {
         const evaluation = data.user_aware.evaluation;
         document.querySelector("#user-aware-divider").hidden = false;
@@ -492,7 +624,7 @@
     }
 
     function renderMetricCards(root, metrics) {
-      ["tfidf_ridge", "context_catboost", "text_context_ridge"].forEach((key) => {
+      Object.keys(metrics).filter((key) => key !== "median").forEach((key) => {
         const values = metrics[key].holdout;
         const section = document.createElement("article");
         section.className = "metric-model";
@@ -517,6 +649,35 @@
           section.append(track);
         });
         root.append(section);
+      });
+    }
+
+    function renderDetailedMetrics(evaluation, metrics) {
+      const root = document.querySelector("#model-metrics-body");
+      Object.entries(metrics).forEach(([name, values]) => {
+        const row = document.createElement("tr");
+        const cells = [
+          metricNames[name] || "Median baseline",
+          evaluation.train_rows,
+          evaluation.holdout_rows,
+          values.train.src,
+          values.train.mae,
+          values.holdout.src,
+          values.holdout.mae,
+          values.holdout.rmse,
+          values.holdout.r2,
+        ];
+        cells.forEach((value, index) => {
+          const cell = document.createElement(index === 0 ? "th" : "td");
+          cell.textContent = value == null
+            ? "n/a"
+            : index < 3
+              ? Number(value).toLocaleString()
+              : Number(value).toFixed(3);
+          if (index === 0) cell.scope = "row";
+          row.append(cell);
+        });
+        root.append(row);
       });
     }
 

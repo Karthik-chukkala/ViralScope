@@ -2,7 +2,7 @@
 
 ## Status
 
-**Full pinned-train target-label scan: complete.** A reproducible metadata EDA path and local training cache now use seven evenly spaced shards with up to four workers. Initial month, category, title-length, and tag-length charts are saved for that sample only, not as full-split findings. Broader full-train EDA and image-quality analysis remain deferred; model results are documented in [Modeling Baselines](modeling-baselines.md).
+**Full pinned-train target-label and text/time EDA: complete.** The project now caches the seven required non-image modeling columns from all 49 pinned train shards. Full-train month/category/title/tag summaries are saved without raw text or IDs. Image-quality analysis remains deferred; modeling results are documented in [Modeling Baselines](modeling-baselines.md).
 
 ## Purpose
 
@@ -36,18 +36,28 @@ To adjust sampling/concurrency, use `--sample-shards 7 --workers 4`. To restore 
 
 The pinned sample contains 42,730 rows from seven evenly spaced shards. It has 10,976 distinct users, no duplicate post IDs in this sample, no missing timestamps/categories/tags, and 1,474 missing titles (3.45%). The most frequent categories are Travel&Active&Sports (9,047), Holiday&Celebrations (7,614), and Fashion (6,381). These figures describe the selected shards only; do not extrapolate them as exact full-train rates. The aggregate output is `artifacts/metadata-eda.json`.
 
-The separate training sample is `data/train-sample.parquet`, with its source revision and shard list in `data/train-sample-manifest.json`. It includes `label`, `Postdate`, `Category`, `Subcategory`, `Concept`, `Title`, and `Alltags`; it excludes IDs, profile/location fields, and image paths. The sample is included in this research repository under the SMP Challenge Community License and contains raw title/tag text. Do not redistribute it outside the license terms or use it for commercial/foundation-model development.
+The seven-shard smoke-test sample is `data/train-sample.parquet`, with source revision and shard list in `data/train-sample-manifest.json`. The full training cache is `data/train-all-safe.parquet`, with provenance in `data/train-all-safe-manifest.json`. Both contain `label`, `Postdate`, `Category`, `Subcategory`, `Concept`, `Title`, and `Alltags`, and exclude IDs, profile/location fields, and image paths. The full cache contains raw title/tag text; distribution is subject to the SMP Challenge Community License and its use restrictions.
 
 ### Text and temporal profile
 
-`viralscope.sample_eda` summarizes the existing local sample without another dataset read. The seven-shard slice covers `2015-02-28` through `2016-02-29` UTC, has 1,474 missing titles (3.45%), and no missing timestamps/categories/tags or invalid timestamps. Nonempty titles have median length 19 characters / 3 whitespace-delimited words; tag fields have a median of 15 whitespace-delimited tokens. The sample label mean is 6.4219 and median is 6.27, close to but not equal to full train; use the complete label-only audit for full-train label statistics.
+`viralscope.sample_eda` summarizes the seven-shard smoke-test sample and the all-shard train cache without another network read. The sample-only report remains at `artifacts/sample-eda.json` and should not be treated as full-train EDA.
 
-Monthly counts, title-length, and tag-token histograms are saved in `artifacts/diagnostics/sample-temporal-text.png`; aggregate counts and quantiles are in `artifacts/sample-eda.json`. The report contains no raw text or IDs. Every temporal/text frequency in this artifact remains sample-only and reflects the selected shard mix.
+### Completed full-train text/time findings
+
+The all-shard report `artifacts/full-train-eda.json` covers 305,613 train rows from all 49 shards. It found 10,553 missing/blank titles (3.45%), three missing/blank tag fields, no missing timestamps/categories, and no invalid timestamps. Dates cover `2015-02-28T16:00:00Z` through `2016-02-29T15:54:26Z`. Nonempty titles have a 19-character median and 3-word median; tag fields have a 16-token median. Categories represented: 11. The sample label mean is 6.4055, matching the complete label audit.
+
+The full-train month/category/title/tag charts are saved in `artifacts/diagnostics/full-train-temporal-text.png`. The report contains aggregate counts and quantiles only, no raw text or IDs. The separate seven-shard chart remains `artifacts/diagnostics/sample-temporal-text.png` and is explicitly sample-only.
 
 Run the local EDA without network access after the sample cache exists:
 
 ```bash
 .venv/bin/python -u -m viralscope.sample_eda
+```
+
+For all train rows after building the full cache:
+
+```bash
+.venv/bin/python -u -m viralscope.sample_eda --data data/train-all-safe.parquet --manifest data/train-all-safe-manifest.json --output artifacts/full-train-eda.json --plot artifacts/diagnostics/full-train-temporal-text.png
 ```
 
 ## Implemented Slice: Target Labels

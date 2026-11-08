@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -34,15 +34,20 @@ CACHE_COLUMNS = (
 )
 
 
-def _read_shard(repository: str, revision: str, shard: Any) -> pa.Table:
+def _read_shard(
+    repository: str,
+    revision: str,
+    shard: Any,
+    columns: tuple[str, ...] = CACHE_COLUMNS,
+) -> pa.Table:
     filesystem = HfFileSystem(token=get_token())
     remote_path = f"datasets/{repository}@{revision}/{shard.rfilename}"
     with filesystem.open(remote_path, "rb", block_size=64 * 1024) as remote_file:
         parquet = pq.ParquetFile(remote_file)
-        missing_columns = set(CACHE_COLUMNS) - set(parquet.schema.names)
+        missing_columns = set(columns) - set(parquet.schema.names)
         if missing_columns:
             raise RuntimeError(f"Missing required columns: {sorted(missing_columns)}")
-        return parquet.read(columns=list(CACHE_COLUMNS))
+        return parquet.read(columns=list(columns))
 
 
 def cache_training_sample(
@@ -81,13 +86,23 @@ def cache_training_sample(
     selected_shards = select_evenly_spaced_shards(train_shards, sample_shards)
 
     with ThreadPoolExecutor(max_workers=min(workers, len(selected_shards))) as executor:
-        futures = [
-            executor.submit(_read_shard, repository, pinned_info.sha, shard)
-            for shard in selected_shards
-        ]
-        tables = [future.result() for future in futures]
+        futures = {
+            executor.submit(_read_shard, repository, pinned_info.sha, shard): index
+            for index, shard in enumerate(selected_shards)
+        }
+        tables: list[pa.Table | None] = [None] * len(selected_shards)
+        rows_loaded = 0
+        for completed, future in enumerate(as_completed(futures), start=1):
+            table = future.result()
+            tables[futures[future]] = table
+            rows_loaded += table.num_rows
+            print(
+                f"Read {completed}/{len(selected_shards)} shards; "
+                f"rows loaded: {rows_loaded}",
+                flush=True,
+            )
 
-    table = pa.concat_tables(tables)
+    table = pa.concat_tables([table for table in tables if table is not None])
     if table.num_rows == 0:
         raise RuntimeError("Selected train shards contained no rows.")
     try:
@@ -111,7 +126,11 @@ def cache_training_sample(
         "split": "train",
         "rows": table.num_rows,
         "columns": list(CACHE_COLUMNS),
-        "sample_method": "evenly_spaced_shards",
+        "sample_method": (
+            "all_train_shards"
+            if len(selected_shards) == len(train_shards)
+            else "evenly_spaced_shards"
+        ),
         "shards_available": len(train_shards),
         "shards_selected": [shard.rfilename for shard in selected_shards],
         "images_downloaded": False,

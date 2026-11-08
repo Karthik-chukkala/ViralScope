@@ -1,0 +1,236 @@
+{
+  "generated_at_utc": "2026-11-08T08:13:35.630517+00:00",
+  "dataset": {
+    "repository": "smpchallenge/SMP-Image",
+    "revision": "f131dba653a05c0e3c6294388f81ed3fbd9c71a0",
+    "split": "train",
+    "sample_method": "all_train_shards",
+    "shards_selected": [
+      "data/train-00000.parquet",
+      "data/train-00001.parquet",
+      "data/train-00002.parquet",
+      "data/train-00003.parquet",
+      "data/train-00004.parquet",
+      "data/train-00005.parquet",
+      "data/train-00006.parquet",
+      "data/train-00007.parquet",
+      "data/train-00008.parquet",
+      "data/train-00009.parquet",
+      "data/train-00010.parquet",
+      "data/train-00011.parquet",
+      "data/train-00012.parquet",
+      "data/train-00013.parquet",
+      "data/train-00014.parquet",
+      "data/train-00015.parquet",
+      "data/train-00016.parquet",
+      "data/train-00017.parquet",
+      "data/train-00018.parquet",
+      "data/train-00019.parquet",
+      "data/train-00020.parquet",
+      "data/train-00021.parquet",
+      "data/train-00022.parquet",
+      "data/train-00023.parquet",
+      "data/train-00024.parquet",
+      "data/train-00025.parquet",
+      "data/train-00026.parquet",
+      "data/train-00027.parquet",
+      "data/train-00028.parquet",
+      "data/train-00029.parquet",
+      "data/train-00030.parquet",
+      "data/train-00031.parquet",
+      "data/train-00032.parquet",
+      "data/train-00033.parquet",
+      "data/train-00034.parquet",
+      "data/train-00035.parquet",
+      "data/train-00036.parquet",
+      "data/train-00037.parquet",
+      "data/train-00038.parquet",
+      "data/train-00039.parquet",
+      "data/train-00040.parquet",
+      "data/train-00041.parquet",
+      "data/train-00042.parquet",
+      "data/train-00043.parquet",
+      "data/train-00044.parquet",
+      "data/train-00045.parquet",
+      "data/train-00046.parquet",
+      "data/train-00047.parquet",
+      "data/train-00048.parquet"
+    ]
+  },
+  "sample_eda": {
+    "rows": 305613,
+    "missing_or_blank": {
+      "Postdate": 0,
+      "Category": 0,
+      "Title": 10553,
+      "Alltags": 3,
+      "label": 0
+    },
+    "invalid_timestamp_count": 0,
+    "postdate_range_utc": {
+      "min": "2015-02-28T16:00:00+00:00",
+      "max": "2016-02-29T15:54:26+00:00"
+    },
+    "monthly_posts_utc": [
+      {
+        "month": "2015-02",
+        "count": 32
+      },
+      {
+        "month": "2015-03",
+        "count": 10521
+      },
+      {
+        "month": "2015-04",
+        "count": 8655
+      },
+      {
+        "month": "2015-05",
+        "count": 17661
+      },
+      {
+        "month": "2015-06",
+        "count": 16660
+      },
+      {
+        "month": "2015-07",
+        "count": 20299
+      },
+      {
+        "month": "2015-08",
+        "count": 19681
+      },
+      {
+        "month": "2015-09",
+        "count": 24999
+      },
+      {
+        "month": "2015-10",
+        "count": 37087
+      },
+      {
+        "month": "2015-11",
+        "count": 27857
+      },
+      {
+        "month": "2015-12",
+        "count": 39714
+      },
+      {
+        "month": "2016-01",
+        "count": 37776
+      },
+      {
+        "month": "2016-02",
+        "count": 44671
+      }
+    ],
+    "category_count": 11,
+    "category_frequencies": [
+      {
+        "category": "Travel&Active&Sports",
+        "count": 66469
+      },
+      {
+        "category": "Holiday&Celebrations",
+        "count": 54751
+      },
+      {
+        "category": "Fashion",
+        "count": 49282
+      },
+      {
+        "category": "Entertainment",
+        "count": 29590
+      },
+      {
+        "category": "Social&People",
+        "count": 23351
+      },
+      {
+        "category": "Whether&Season",
+        "count": 20292
+      },
+      {
+        "category": "Animal",
+        "count": 19992
+      },
+      {
+        "category": "Food",
+        "count": 16727
+      },
+      {
+        "category": "Urban",
+        "count": 15272
+      },
+      {
+        "category": "Electronics",
+        "count": 5613
+      },
+      {
+        "category": "Family",
+        "count": 4274
+      }
+    ],
+    "top_5_categories": [
+      {
+        "category": "Travel&Active&Sports",
+        "count": 66469
+      },
+      {
+        "category": "Holiday&Celebrations",
+        "count": 54751
+      },
+      {
+        "category": "Fashion",
+        "count": 49282
+      },
+      {
+        "category": "Entertainment",
+        "count": 29590
+      },
+      {
+        "category": "Social&People",
+        "count": 23351
+      }
+    ],
+    "title_character_lengths": {
+      "count": 295060,
+      "min": 1,
+      "median": 19.0,
+      "mean": 28.66259404866807,
+      "p90": 54.0,
+      "max": 263
+    },
+    "title_word_counts": {
+      "count": 295060,
+      "min": 1,
+      "median": 3.0,
+      "mean": 4.2139700399918665,
+      "p90": 9.0,
+      "max": 56
+    },
+    "tag_token_counts": {
+      "count": 305610,
+      "min": 1,
+      "median": 16.0,
+      "mean": 21.066604495926182,
+      "p90": 49.0,
+      "max": 75
+    },
+    "label_summary": {
+      "count": 305613,
+      "min": 1.0,
+      "median": 6.230000019073486,
+      "mean": 6.405524077906263,
+      "max": 16.559999465942383
+    },
+    "privacy": {
+      "raw_text_written": false,
+      "user_ids_read": false,
+      "post_ids_read": false,
+      "image_bytes_read": false
+    }
+  },
+  "plot": "artifacts/diagnostics/full-train-temporal-text.png"
+}

@@ -5,6 +5,8 @@ import pandas as pd
 
 from viralscope.train_baselines import (
     _holdout_category_metrics,
+    build_features,
+    build_inference_features,
     chronological_split,
     summarize_residuals,
     user_aware_split,
@@ -13,6 +15,39 @@ from viralscope.temporal_sensitivity import _best_models
 
 
 class TrainBaselineTests(unittest.TestCase):
+    def test_inference_features_match_training_transforms_without_label(self) -> None:
+        frame = pd.DataFrame(
+            {
+                "Postdate": ["1451606400", "1454284800"],
+                "Category": ["Food", "Urban"],
+                "Subcategory": ["Dessert", "Street"],
+                "Concept": ["berries", "rain"],
+                "Title": ["Berry tart", None],
+                "Alltags": ["fresh sweet", "city lights"],
+                "label": [6.0, 7.0],
+            }
+        )
+
+        training_features, _, _ = build_features(frame)
+        inference_features = build_inference_features(frame.drop(columns="label"))
+
+        pd.testing.assert_frame_equal(training_features, inference_features)
+
+    def test_inference_features_reject_invalid_timestamps(self) -> None:
+        frame = pd.DataFrame(
+            {
+                "Postdate": ["bad"],
+                "Category": ["Food"],
+                "Subcategory": [""],
+                "Concept": [""],
+                "Title": ["test"],
+                "Alltags": ["tag"],
+            }
+        )
+
+        with self.assertRaisesRegex(ValueError, "invalid timestamps"):
+            build_inference_features(frame)
+
     def test_temporal_best_model_counts_cover_each_cutoff(self) -> None:
         runs = [
             {

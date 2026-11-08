@@ -20,22 +20,33 @@ from sklearn.pipeline import Pipeline
 from .train_baselines import CATEGORICAL_FEATURES, TIME_FEATURES
 
 ROOT = Path(__file__).resolve().parents[1]
-MODEL_DIR = ROOT / "artifacts/models"
+MODEL_DIR = ROOT / "artifacts/models/final"
 METRICS_PATH = ROOT / "artifacts/baseline-metrics.json"
 USER_AWARE_METRICS_PATH = ROOT / "artifacts/user-aware-metrics.json"
 TEMPORAL_METRICS_PATH = ROOT / "artifacts/temporal-sensitivity.json"
 TARGET_AUDIT_PATH = ROOT / "artifacts/train-target-audit.json"
 METADATA_EDA_PATH = ROOT / "artifacts/metadata-eda.json"
 SAMPLE_EDA_PATH = ROOT / "artifacts/sample-eda.json"
+FULL_TRAIN_EDA_PATH = ROOT / "artifacts/full-train-eda.json"
+TEST_INFERENCE_PATH = ROOT / "artifacts/test-inference-report.json"
 DIAGNOSTIC_DIR = ROOT / "artifacts/diagnostics"
 DIAGNOSTIC_FILES = {
     "holdout-actual-vs-predicted.png",
     "holdout-residuals.png",
     "holdout-mae-by-category.png",
     "sample-temporal-text.png",
+    "full-train-temporal-text.png",
 }
 WEB_PAGE = ROOT / "web/index.html"
-MODEL_CHOICES = ("tfidf_ridge", "context_catboost", "text_context_ridge")
+MODEL_CHOICES = (
+    "tfidf_ridge",
+    "tfidf_sgd",
+    "tfidf_sgd_huber",
+    "context_catboost",
+    "context_catboost_shallow",
+    "text_context_ridge",
+)
+TEXT_MODEL_CHOICES = {"tfidf_ridge", "tfidf_sgd", "tfidf_sgd_huber"}
 
 app = FastAPI(title="ViralScope local demo", docs_url=None, redoc_url=None)
 
@@ -47,7 +58,14 @@ class PredictionRequest(BaseModel):
     subcategory: str = Field(default="", max_length=100)
     concept: str = Field(default="", max_length=200)
     planned_at: datetime
-    model: Literal["tfidf_ridge", "context_catboost", "text_context_ridge"] = "tfidf_ridge"
+    model: Literal[
+        "tfidf_ridge",
+        "tfidf_sgd",
+        "tfidf_sgd_huber",
+        "context_catboost",
+        "context_catboost_shallow",
+        "text_context_ridge",
+    ] = "tfidf_ridge"
 
 
 def make_prediction_features(request: PredictionRequest) -> tuple[pd.DataFrame, str]:
@@ -73,31 +91,39 @@ def make_prediction_features(request: PredictionRequest) -> tuple[pd.DataFrame, 
     return pd.DataFrame([features]), planned_at.isoformat()
 
 
-@lru_cache(maxsize=1)
-def _load_models() -> dict[str, Any]:
+@lru_cache(maxsize=4)
+def load_models(model_dir: Path = MODEL_DIR) -> dict[str, Any]:
     required = [
-        MODEL_DIR / "tfidf-ridge.joblib",
-        MODEL_DIR / "context-catboost.cbm",
-        MODEL_DIR / "text-context-ridge.joblib",
+        model_dir / "tfidf-ridge.joblib",
+        model_dir / "tfidf-sgd.joblib",
+        model_dir / "tfidf-sgd-huber.joblib",
+        model_dir / "context-catboost.cbm",
+        model_dir / "context-catboost-shallow.cbm",
+        model_dir / "text-context-ridge.joblib",
     ]
     missing = [path for path in required if not path.exists()]
     if missing:
         raise RuntimeError("Train the baseline models before starting the demo.")
     context_model = CatBoostRegressor()
-    context_model.load_model(str(required[1]))
+    context_model.load_model(str(required[3]))
+    shallow_context_model = CatBoostRegressor()
+    shallow_context_model.load_model(str(required[4]))
     return {
         "tfidf_ridge": joblib.load(required[0]),
+        "tfidf_sgd": joblib.load(required[1]),
+        "tfidf_sgd_huber": joblib.load(required[2]),
         "context_catboost": context_model,
-        "text_context_ridge": joblib.load(required[2]),
+        "context_catboost_shallow": shallow_context_model,
+        "text_context_ridge": joblib.load(required[5]),
     }
 
 
 def _top_contributions(model_name: str, model: Any, features: pd.DataFrame) -> list[dict[str, Any]]:
-    if model_name == "context_catboost":
+    if model_name.startswith("context_catboost"):
         pool = Pool(features[CATEGORICAL_FEATURES + TIME_FEATURES], cat_features=CATEGORICAL_FEATURES)
         values = model.get_feature_importance(pool, type="ShapValues")[0, :-1]
         names = CATEGORICAL_FEATURES + TIME_FEATURES
-    elif model_name == "tfidf_ridge":
+    elif model_name in TEXT_MODEL_CHOICES:
         vectorizer = model.named_steps["tfidf"]
         matrix = vectorizer.transform(features["text"])
         contributions = matrix.multiply(model.named_steps["regressor"].coef_).toarray()[0]
@@ -174,6 +200,21 @@ def dataset_summary() -> dict[str, Any]:
     if SAMPLE_EDA_PATH.exists():
         sample_eda_report = json.loads(SAMPLE_EDA_PATH.read_text(encoding="utf-8"))
         sample_eda = sample_eda_report["sample_eda"]
+    full_train_eda = None
+    if FULL_TRAIN_EDA_PATH.exists():
+        full_train_report = json.loads(FULL_TRAIN_EDA_PATH.read_text(encoding="utf-8"))
+        full_train_eda = full_train_report["sample_eda"]
+    test_inference = None
+    if TEST_INFERENCE_PATH.exists():
+        test_report = json.loads(TEST_INFERENCE_PATH.read_text(encoding="utf-8"))
+        test_inference = {
+            "prediction_rows": test_report["prediction_rows"],
+            "test_shards": len(test_report["dataset"]["shards_selected"]),
+            "models": test_report["models"],
+            "training_label_range": test_report["training_label_range"],
+            "test_metrics_computed": test_report["test_metrics_computed"],
+            "test_metric_note": test_report["test_metric_note"],
+        }
     target_summary = target_report["target"]["non_sentinel_summary"]
     target_summary["histogram_counts"] = target_report["target"]["non_sentinel_histogram"]["counts"]
     target_summary["histogram_edges"] = target_report["target"]["non_sentinel_histogram"]["bin_edges"]
@@ -189,6 +230,8 @@ def dataset_summary() -> dict[str, Any]:
             "categories": metadata_report["eda"]["category_frequencies"],
         },
         "sample_text_temporal_eda": sample_eda,
+        "full_train_eda": full_train_eda,
+        "test_inference": test_inference,
     }
 
 
@@ -199,15 +242,15 @@ def json_read_metrics() -> dict[str, Any]:
 @app.post("/api/predict")
 def predict(request: PredictionRequest) -> dict[str, Any]:
     try:
-        models = _load_models()
+        models = load_models()
     except RuntimeError as error:
         raise HTTPException(status_code=503, detail=str(error)) from error
 
     features, planned_at = make_prediction_features(request)
     model = models[request.model]
-    if request.model == "tfidf_ridge":
+    if request.model in TEXT_MODEL_CHOICES:
         prediction = float(model.predict(features["text"])[0])
-    elif request.model == "context_catboost":
+    elif request.model.startswith("context_catboost"):
         prediction = float(model.predict(features[CATEGORICAL_FEATURES + TIME_FEATURES])[0])
     else:
         prediction = float(model.predict(features)[0])

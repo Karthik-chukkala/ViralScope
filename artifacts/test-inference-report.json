@@ -1,0 +1,128 @@
+{
+  "generated_at_utc": "2026-11-08T09:22:11.515821+00:00",
+  "dataset": {
+    "generated_at_utc": "2026-11-08T08:01:08.063650+00:00",
+    "dataset": "smpchallenge/SMP-Image",
+    "revision": "f131dba653a05c0e3c6294388f81ed3fbd9c71a0",
+    "split": "test",
+    "rows": 180581,
+    "expected_rows": 180581,
+    "columns": [
+      "Postdate",
+      "Category",
+      "Subcategory",
+      "Concept",
+      "Title",
+      "Alltags"
+    ],
+    "shards_available": 29,
+    "shards_selected": [
+      "data/test-00000.parquet",
+      "data/test-00001.parquet",
+      "data/test-00002.parquet",
+      "data/test-00003.parquet",
+      "data/test-00004.parquet",
+      "data/test-00005.parquet",
+      "data/test-00006.parquet",
+      "data/test-00007.parquet",
+      "data/test-00008.parquet",
+      "data/test-00009.parquet",
+      "data/test-00010.parquet",
+      "data/test-00011.parquet",
+      "data/test-00012.parquet",
+      "data/test-00013.parquet",
+      "data/test-00014.parquet",
+      "data/test-00015.parquet",
+      "data/test-00016.parquet",
+      "data/test-00017.parquet",
+      "data/test-00018.parquet",
+      "data/test-00019.parquet",
+      "data/test-00020.parquet",
+      "data/test-00021.parquet",
+      "data/test-00022.parquet",
+      "data/test-00023.parquet",
+      "data/test-00024.parquet",
+      "data/test-00025.parquet",
+      "data/test-00026.parquet",
+      "data/test-00027.parquet",
+      "data/test-00028.parquet"
+    ],
+    "purpose": "inference_only_unlabeled_split",
+    "labels_cached": false,
+    "ids_cached": false,
+    "images_downloaded": false
+  },
+  "prediction_rows": 180581,
+  "models": {
+    "tfidf_ridge": {
+      "rows": 180581,
+      "min": 0.552413369586013,
+      "p10": 4.905127672305994,
+      "median": 6.5341189940386,
+      "mean": 6.688626840105911,
+      "p90": 8.692477302799402,
+      "max": 18.414904466732686,
+      "outside_train_label_range_count": 17
+    },
+    "tfidf_sgd": {
+      "rows": 180581,
+      "min": 0.8648855309659291,
+      "p10": 5.4789555948822795,
+      "median": 6.509887737257094,
+      "mean": 6.677032344555665,
+      "p90": 8.12190672957453,
+      "max": 13.757141804875022,
+      "outside_train_label_range_count": 1
+    },
+    "tfidf_sgd_huber": {
+      "rows": 180581,
+      "min": 4.441417883188734,
+      "p10": 5.330641530558545,
+      "median": 5.856213327959705,
+      "mean": 5.934520386796424,
+      "p90": 6.6224428880693464,
+      "max": 9.105588058269436,
+      "outside_train_label_range_count": 0
+    },
+    "context_catboost": {
+      "rows": 180581,
+      "min": 2.1292341128402663,
+      "p10": 4.342357578192383,
+      "median": 5.994116353779667,
+      "mean": 5.99781629541897,
+      "p90": 7.639454687056088,
+      "max": 11.12460307300477,
+      "outside_train_label_range_count": 0
+    },
+    "context_catboost_shallow": {
+      "rows": 180581,
+      "min": 2.832912260275679,
+      "p10": 4.250691933835375,
+      "median": 5.8925554448762,
+      "mean": 5.886457071137003,
+      "p90": 7.528837845645856,
+      "max": 10.407526969310945,
+      "outside_train_label_range_count": 0
+    },
+    "text_context_ridge": {
+      "rows": 180581,
+      "min": 0.2699670941144916,
+      "p10": 3.9694883483904384,
+      "median": 5.883152700551081,
+      "mean": 6.022793772357909,
+      "p90": 8.253537704619871,
+      "max": 16.45570197347773,
+      "outside_train_label_range_count": 7
+    }
+  },
+  "training_label_range": {
+    "min": 1.0,
+    "max": 16.559999465942383
+  },
+  "prediction_file": "artifacts/test-inference-predictions.parquet",
+  "test_metrics_computed": false,
+  "test_metric_note": "The public test labels are withheld (-1); inference predictions are not scored.",
+  "raw_text_written": false,
+  "user_ids_written": false,
+  "post_ids_written": false
+}

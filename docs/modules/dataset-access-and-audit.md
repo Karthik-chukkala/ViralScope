@@ -2,7 +2,7 @@
 
 ## Status
 
-**Metadata-only CLI, full label-column audit, and bounded image check: verified.** Seven evenly spaced train shards have also been range-read for metadata and cached locally with selected non-image columns for baseline training. The full Parquet dataset and image corpus have not been downloaded.
+**Metadata-only CLI, full label-column audit, bounded image check, and all-shard non-image projections: verified.** All 49 train shards are cached with selected modeling columns and labels; all 29 test shards are cached with inference inputs only. The original image-bearing Parquet files and image corpus have not been downloaded.
 
 ## Purpose
 
@@ -20,7 +20,7 @@ Sources: [2019 paper](https://arxiv.org/abs/1910.01795), [2024 arXiv paper](http
 
 The project uses the existing WSL `.venv` and `datasets` / `huggingface_hub` packages recorded in [setup](../../files/setup.txt). The project owner reports completing Hugging Face browser authorization. A metadata probe inside WSL found a locally configured HF CLI credential without printing its value, and successfully read repository metadata and the dataset card.
 
-Browser login and a WSL Python credential are not necessarily the same session. For repeatability, run commands from the project root using `.venv/bin/python`. The current sample cache uses pinned remote Parquet range reads; it does not fetch whole image-bearing shards. Never put a token in a command, source file, notebook, screenshot, or documentation. If access later fails, check the local HF login without exposing credential contents.
+Browser login and a WSL Python credential are not necessarily the same session. For repeatability, run commands from the project root using `.venv/bin/python`. The current caches use pinned remote Parquet range reads and column projection; they do not fetch image bytes or full image-bearing shards. Never put a token in a command, source file, notebook, screenshot, or documentation. If access later fails, check the local HF login without exposing credential contents.
 
 ## Verified Metadata
 
@@ -134,4 +134,4 @@ This access module is complete when the license summary and revision are recorde
 
 ## Next Step
 
-The access audit, full label scan, seven-shard metadata sample, initial text/context model ladder, and local review demo are implemented. Chronological sensitivity and a separate user-disjoint evaluation are also available. Next, broaden EDA, consider a combined future-time/unseen-user protocol, and review the complete license/AUP with the supervisor before any public deployment or image use. Do not score the public test split; its sampled `-1` labels are withheld placeholders.
+The access audit, full label scan, all-shard non-image train/test caches, six-model text/context ladder, three evaluation views, full-train EDA, and local review demo are implemented. Next, consider a combined future-time/unseen-user protocol, validate explanation stability, and review the complete license/AUP with the supervisor before any public deployment or image use. Do not score the public test split; its labels are withheld placeholders.

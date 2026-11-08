@@ -90,6 +90,10 @@ def summarize_sample(frame: pd.DataFrame) -> tuple[dict[str, Any], dict[str, np.
             for month, count in monthly.items()
         ],
         "category_count": len(category_counts),
+        "category_frequencies": [
+            {"category": category, "count": int(count)}
+            for category, count in category_counts.most_common()
+        ],
         "top_5_categories": [
             {"category": category, "count": int(count)}
             for category, count in category_counts.most_common(5)
@@ -115,32 +119,44 @@ def summarize_sample(frame: pd.DataFrame) -> tuple[dict[str, Any], dict[str, np.
         "dates": dates,
         "title_lengths": title_lengths,
         "tag_token_counts": tag_token_counts,
+        "category_frequencies": report["category_frequencies"],
     }
     return report, plot_data
 
 
 def _save_plot(plot_data: dict[str, Any], output_path: Path) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    figure, axes = plt.subplots(1, 3, figsize=(14, 4), constrained_layout=True)
+    figure, axes = plt.subplots(2, 2, figsize=(14, 9), constrained_layout=True)
+    axes = axes.ravel()
 
     monthly = plot_data["dates"].dropna().dt.strftime("%Y-%m").value_counts().sort_index()
     axes[0].bar(monthly.index, monthly.values, color="#17685c")
-    axes[0].set_title("Sample posts by month (UTC)")
+    axes[0].set_title("Posts by month (UTC)")
     axes[0].set_ylabel("Posts")
     axes[0].tick_params(axis="x", labelrotation=55)
     axes[0].grid(axis="y", alpha=0.2)
 
-    axes[1].hist(plot_data["title_lengths"], bins=30, color="#d7a338", edgecolor="white")
-    axes[1].set_title("Title length")
-    axes[1].set_xlabel("Characters")
-    axes[1].set_ylabel("Posts")
-    axes[1].grid(axis="y", alpha=0.2)
+    categories = plot_data["category_frequencies"]
+    axes[1].barh(
+        [item["category"] for item in reversed(categories)],
+        [item["count"] for item in reversed(categories)],
+        color="#c34f3c",
+    )
+    axes[1].set_title("Posts by category")
+    axes[1].set_xlabel("Posts")
+    axes[1].grid(axis="x", alpha=0.2)
 
-    axes[2].hist(plot_data["tag_token_counts"], bins=30, color="#c34f3c", edgecolor="white")
-    axes[2].set_title("Tag field length")
-    axes[2].set_xlabel("Whitespace-delimited tokens")
+    axes[2].hist(plot_data["title_lengths"], bins=30, color="#d7a338", edgecolor="white")
+    axes[2].set_title("Title length")
+    axes[2].set_xlabel("Characters")
     axes[2].set_ylabel("Posts")
     axes[2].grid(axis="y", alpha=0.2)
+
+    axes[3].hist(plot_data["tag_token_counts"], bins=30, color="#5785a1", edgecolor="white")
+    axes[3].set_title("Tag field length")
+    axes[3].set_xlabel("Whitespace-delimited tokens")
+    axes[3].set_ylabel("Posts")
+    axes[3].grid(axis="y", alpha=0.2)
 
     figure.savefig(output_path, dpi=150)
     plt.close(figure)

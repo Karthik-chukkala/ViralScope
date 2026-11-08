@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
@@ -34,7 +34,7 @@ def _read_user_ids(repository: str, revision: str, filename: str) -> list[str]:
     return [str(value) for value in values]
 
 
-def fetch_sample_user_ids(
+def fetch_manifest_user_ids(
     manifest_path: Path = DEFAULT_MANIFEST,
     workers: int = 4,
 ) -> tuple[dict[str, Any], list[str]]:
@@ -64,12 +64,25 @@ def fetch_sample_user_ids(
     if missing_shards:
         raise RuntimeError(f"Manifest shards are missing at the pinned revision: {sorted(missing_shards)}")
 
+    print(
+        f"Reading split-only user IDs from {len(selected_names)} pinned train shards...",
+        flush=True,
+    )
     with ThreadPoolExecutor(max_workers=min(workers, len(selected_names))) as executor:
-        futures = [
-            executor.submit(_read_user_ids, repository, revision, filename)
-            for filename in selected_names
-        ]
-        user_ids = [user_id for future in futures for user_id in future.result()]
+        futures = {
+            executor.submit(_read_user_ids, repository, revision, filename): index
+            for index, filename in enumerate(selected_names)
+        }
+        shard_user_ids: list[list[str] | None] = [None] * len(selected_names)
+        for completed, future in enumerate(as_completed(futures), start=1):
+            values = future.result()
+            shard_user_ids[futures[future]] = values
+            print(
+                f"Read IDs from {completed}/{len(selected_names)} shards; "
+                f"rows loaded: {sum(len(ids) for ids in shard_user_ids if ids is not None)}",
+                flush=True,
+            )
+        user_ids = [user_id for ids in shard_user_ids if ids is not None for user_id in ids]
 
     if len(user_ids) != manifest["rows"]:
         raise RuntimeError(
@@ -87,7 +100,7 @@ def run_user_aware_evaluation(
     diagnostic_dir: Path = DEFAULT_DIAGNOSTIC_DIR,
     workers: int = 4,
 ) -> dict[str, Any]:
-    manifest, user_ids = fetch_sample_user_ids(manifest_path, workers)
+    manifest, user_ids = fetch_manifest_user_ids(manifest_path, workers)
     if data_path.stat().st_size == 0:
         raise RuntimeError("The local sample cache is empty.")
 
