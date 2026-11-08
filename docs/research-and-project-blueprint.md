@@ -134,24 +134,25 @@ Never select the model or tune parameters on the final test set. Training metric
 
 ### Suggested model ladder
 
-Start small and keep each experiment identifiable:
+The current six learned variants are a controlled Part 1 baseline ladder, not exact reproductions of challenge submissions:
 
-1. **Sanity baselines:** median predictor; simple category/time structured regressor.
-2. **Text-only:** title and tags with TF-IDF plus Ridge.
-3. **Structured-only:** category and carefully derived planned-time features with CatBoost.
-4. **Text + context:** combine the text representation and eligible structured features, then compare against the single-group baselines.
-5. **Deferred image branch:** if time and license review permit after Part 1, extract frozen pretrained visual features and cache embeddings; only then test image-only and multimodal fusion.
-6. **Optional temporal extension:** sequence features from each user's earlier posts, strictly using data before the target timestamp.
+1. **Median baseline:** non-learned reference score.
+2. **TF-IDF + Ridge:** sparse title/tag linear baseline.
+3. **TF-IDF + SGD, squared error:** scalable linear optimization comparison.
+4. **TF-IDF + SGD, Huber loss:** robust-loss comparison; it is retained even though current holdout results are weak.
+5. **Context CatBoost, standard and shallow:** nonlinear category/time baseline and depth/regularization comparison.
+6. **Text + context Ridge:** late feature fusion against the text-only and context-only variants.
+7. **Deferred image branch:** after license/AUP review, optionally extract frozen visual features and cache embeddings; image-only and multimodal fusion are not current Part 1 results.
 
-The 2019/2024 papers support these as research-grounded comparisons. Large-model fine-tuning, video, graph neural networks, and elaborate contrastive learning are optional future work, not prerequisites for a credible Part 1.
+These variants reflect model families discussed in the 2024 overview and allow meaningful within-project comparisons, but they are **not directly comparable** to FastText/BERT/ResNeXt challenge results unless the representation, dataset, split, and protocol match. Large-model fine-tuning, video, graph neural networks, and contrastive learning remain future work.
 
 ### Metrics and analysis
 
-Primary challenge metrics: SRC and MAE. Add RMSE (penalizes larger errors) and $R^2$ (variance explained, interpreted with care) as complementary regression metrics. Report these on the local labeled holdout, alongside sample counts and label distributions. Report final/official test metrics only if genuine test labels are available; the current HF test sample contains `-1` placeholders and is not scoreable. Include:
+Primary challenge metrics: SRC and MAE. Add RMSE (penalizes larger errors) and $R^2$ (variance explained, interpreted with care) as complementary regression metrics. Report these on documented local labeled holdouts, alongside counts and label distributions. The full train split has 305,613 labeled rows; the public test split has 180,581 rows, but sampled labels were `-1`, so all-test predictions are inference-only and have no reportable accuracy/MAE/SRC. Include:
 
 - Per-category and popularity-range performance.
 - Error distribution/residual plots and prediction-versus-target plots.
-- Ablations: text only, image only, structured only, and fused; optionally remove each feature group from the chosen model.
+- Ablations: text-only, context-only, and text + context; defer image ablations until licensed image features are implemented.
 - A basic baseline comparison and train-versus-validation gap.
 - Runtime/model size if they matter to the demo.
 
